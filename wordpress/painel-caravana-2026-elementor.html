@@ -1,0 +1,838 @@
+<!-- ===== INICIO: Painel Caravana Energia da Cultura 2026 (adaptado para Elementor/WordPress) ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>#cv2026-painel {
+            --verde: #009B39;
+            --verde-escuro: #12422B;
+            --azul: #52A2DA;
+            --laranja: #F59C00;
+            --fundo: #FFF9F4;
+            --vermelho: #E74C3C;
+            --tinta: #2B2B27;
+            --tinta-suave: #6B6459;
+            --borda: #E9E1D3;
+            --superficie: #FFFFFF;
+            --muted: #B7AF9E;
+            --muted-fill: #EDE7D9;
+            --sombra: 0 1px 2px rgba(18,66,43,0.06), 0 1px 1px rgba(18,66,43,0.04);
+            --raio: 12px;
+        }#cv2026-painel * { box-sizing: border-box; }#cv2026-painel {
+            font-family: 'Barlow', sans-serif;
+            background-color: var(--fundo);
+            color: var(--tinta);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }#cv2026-painel header {
+            background-color: var(--verde-escuro);
+            padding: 22px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }#cv2026-painel header .brand { display: flex; align-items: center; gap: 18px; }#cv2026-painel header h1 {
+            color: white;
+            margin: 0;
+            font-weight: 800;
+            font-size: 22px;
+            letter-spacing: 0.01em;
+        }#cv2026-painel header .subtitle {
+            color: rgba(255,255,255,0.62);
+            font-size: 13px;
+            font-weight: 500;
+            margin-top: 3px;
+        }#cv2026-painel .container {
+            max-width: 1680px;
+            width: 94%;
+            margin: 34px auto;
+            padding: 0 10px;
+        }#cv2026-painel .tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 34px;
+            border-bottom: 1px solid var(--borda);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }#cv2026-painel .tabs::-webkit-scrollbar { display: none; }#cv2026-painel .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--tinta-suave);
+            font-size: 15px;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }#cv2026-painel .tab:hover { color: var(--verde-escuro); }#cv2026-painel .tab.active { color: var(--verde-escuro); border-bottom-color: var(--verde); }#cv2026-painel .tab-content { display: none; animation: cv2026FadeIn 0.3s ease-in-out; }#cv2026-painel .tab-content.active { display: block; }
+
+        @keyframes cv2026FadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }#cv2026-painel .section-head { margin: 46px 0 18px; }#cv2026-painel .section-head:first-child { margin-top: 0; }#cv2026-painel .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--verde);
+            margin: 0 0 6px;
+        }#cv2026-painel .section-head h2 {
+            margin: 0;
+            color: var(--verde-escuro);
+            font-size: 26px;
+            font-weight: 800;
+        }#cv2026-painel .section-head p.lead {
+            margin: 8px 0 0;
+            color: var(--tinta-suave);
+            font-size: 15.5px;
+            max-width: 820px;
+            line-height: 1.6;
+        }#cv2026-painel .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 12px;
+        }#cv2026-painel .card {
+            background-color: var(--superficie);
+            padding: 22px 24px;
+            border-radius: var(--raio);
+            border: 1px solid var(--borda);
+            box-shadow: var(--sombra);
+            position: relative;
+            overflow: hidden;
+        }#cv2026-painel .card::before {
+            content: "";
+            position: absolute; top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--laranja);
+        }#cv2026-painel .card.validas::before { background: var(--verde); }#cv2026-painel .card.nao-enviadas::before { background: var(--vermelho); }#cv2026-painel .card.unicas::before { background: var(--azul); }#cv2026-painel .card.novo::before { background: var(--verde-escuro); }#cv2026-painel .card h3 {
+            margin: 0 0 10px;
+            color: var(--tinta-suave);
+            font-size: 12.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }#cv2026-painel .card .value {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--verde-escuro);
+            margin-bottom: 6px;
+            line-height: 1.1;
+        }#cv2026-painel .card .indicator {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--tinta-suave);
+        }#cv2026-painel .card p.desc {
+            margin: 8px 0 0;
+            font-size: 12.5px;
+            color: var(--tinta-suave);
+            line-height: 1.5;
+        }#cv2026-painel .subhead-row { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin: 40px 0 16px; }#cv2026-painel .subhead-row h3 { margin: 0; color: var(--verde-escuro); font-size: 18px; font-weight: 700; }#cv2026-painel .subhead-row span.tag {
+            font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+            background: var(--muted-fill); color: var(--verde-escuro); padding: 4px 10px; border-radius: 20px;
+        }#cv2026-painel .charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }#cv2026-painel .span-1 { grid-column: span 1; }#cv2026-painel .span-2 { grid-column: span 2; }#cv2026-painel .span-3 { grid-column: span 3; }
+
+        @media (max-width: 1200px) {#cv2026-painel .charts-grid { grid-template-columns: repeat(2, 1fr); }#cv2026-painel .span-1, #cv2026-painel .span-2, #cv2026-painel .span-3 { grid-column: span 2; }
+        }
+        @media (max-width: 768px) {#cv2026-painel .charts-grid { grid-template-columns: 1fr; }#cv2026-painel .span-1, #cv2026-painel .span-2, #cv2026-painel .span-3 { grid-column: span 1; }
+        }#cv2026-painel .chart-container {
+            background-color: var(--superficie);
+            padding: 22px;
+            border-radius: var(--raio);
+            border: 1px solid var(--borda);
+            box-shadow: var(--sombra);
+            display: flex;
+            flex-direction: column;
+        }#cv2026-painel .chart-container h3 {
+            color: var(--verde-escuro);
+            margin: 0 0 4px;
+            font-size: 15px;
+            font-weight: 700;
+        }#cv2026-painel .chart-container .chart-note { font-size: 12px; color: var(--tinta-suave); margin: 0 0 14px; }#cv2026-painel .chart-wrapper { position: relative; width: 100%; height: 270px; }#cv2026-painel .chart-wrapper.tall { height: 300px; }#cv2026-painel .chart-wrapper.short { height: 200px; }#cv2026-painel .insights-box {
+            background-color: var(--superficie);
+            padding: 34px;
+            border-radius: var(--raio);
+            border: 1px solid var(--borda);
+            box-shadow: var(--sombra);
+            line-height: 1.75;
+            font-size: 16px;
+            margin-bottom: 22px;
+        }#cv2026-painel .insights-box h2 { color: var(--verde-escuro); margin-top: 0; font-size: 20px; }#cv2026-painel .insights-box ul { padding-left: 20px; margin: 0; }#cv2026-painel .insights-box li { margin-bottom: 12px; }#cv2026-painel .highlight { color: var(--laranja); font-weight: 700; }#cv2026-painel .highlight-verde { color: var(--verde); font-weight: 700; }#cv2026-painel .highlight-azul { color: #2f7db5; font-weight: 700; }#cv2026-painel article.report { max-width: 900px; margin: 0 auto; }#cv2026-painel article.report h2 { color: var(--verde-escuro); font-size: 22px; margin: 44px 0 12px; }#cv2026-painel article.report h2:first-of-type { margin-top: 0; }#cv2026-painel article.report h4 { color: var(--verde-escuro); font-size: 15.5px; margin: 20px 0 6px; }#cv2026-painel article.report p { line-height: 1.75; font-size: 15.5px; color: var(--tinta); margin: 0 0 14px; }#cv2026-painel article.report ul { line-height: 1.75; font-size: 15.5px; padding-left: 20px; }#cv2026-painel article.report li { margin-bottom: 6px; }#cv2026-painel blockquote.pull {
+            margin: 24px 0; padding: 4px 0 4px 20px; border-left: 4px solid var(--laranja);
+            font-size: 17px; font-weight: 600; color: var(--verde-escuro); font-style: normal;
+        }#cv2026-painel .hero-report {
+            background: linear-gradient(135deg, var(--verde-escuro), #0b2a1b);
+            color: white; border-radius: var(--raio); padding: 46px 40px; margin-bottom: 36px;
+        }#cv2026-painel .hero-report .eyebrow { color: #7fd9a8; }#cv2026-painel .hero-report h1 { margin: 0 0 12px; font-size: 30px; font-weight: 800; }#cv2026-painel .hero-report p { color: rgba(255,255,255,0.82); font-size: 16px; max-width: 700px; line-height: 1.7; margin: 0; }#cv2026-painel .hero-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 18px; margin-top: 30px; }#cv2026-painel .hero-stats .hs-value { font-size: 32px; font-weight: 800; color: white; }#cv2026-painel .hero-stats .hs-label { font-size: 12.5px; color: rgba(255,255,255,0.65); text-transform: uppercase; letter-spacing: .05em; margin-top: 4px; }#cv2026-painel .divider { height: 1px; background: var(--borda); margin: 40px 0; border: none; }#cv2026-painel table.datatable { width: 100%; border-collapse: collapse; font-size: 14px; margin: 10px 0 24px; }#cv2026-painel table.datatable th {
+            text-align: left; padding: 10px 12px; background: var(--muted-fill); color: var(--verde-escuro);
+            font-weight: 700; font-size: 12.5px; text-transform: uppercase; letter-spacing: .04em;
+        }#cv2026-painel table.datatable td { padding: 10px 12px; border-bottom: 1px solid var(--borda); color: var(--tinta); }#cv2026-painel table.datatable tr:last-child td { border-bottom: none; }#cv2026-painel table.datatable .num { text-align: right; font-variant-numeric: tabular-nums; }#cv2026-painel .table-wrap { overflow-x: auto; border-radius: var(--raio); border: 1px solid var(--borda); background: var(--superficie); box-shadow: var(--sombra); }#cv2026-painel .table-wrap table.datatable { margin: 0; }#cv2026-painel .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }#cv2026-painel .pill-verde { background: #E4F3E9; color: #0d6b2b; }#cv2026-painel .pill-azul { background: #E7F1FA; color: #2f7db5; }#cv2026-painel .pill-laranja { background: #FDF0DA; color: #b06f00; }#cv2026-painel .uf-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; margin-bottom: 10px; }#cv2026-painel .uf-card { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); padding: 20px; }#cv2026-painel .uf-card .uf-code { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 8px; background: var(--verde-escuro); color: white; font-weight: 800; font-size: 13px; margin-bottom: 12px; }#cv2026-painel .uf-role { margin-top: 12px; }#cv2026-painel .uf-role .role-label { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--tinta-suave); font-weight: 700; }#cv2026-painel .uf-role .role-name { font-size: 14.5px; font-weight: 600; color: var(--verde-escuro); margin-top: 2px; }#cv2026-painel .uf-role .role-tag { font-size: 11.5px; color: var(--tinta-suave); }#cv2026-painel .stat-tile-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 18px 0 8px; }#cv2026-painel .stat-tile { background: var(--superficie); border: 1px solid var(--borda); border-radius: var(--raio); box-shadow: var(--sombra); padding: 20px; text-align: center; }#cv2026-painel .stat-tile .st-value { font-size: 30px; font-weight: 800; color: var(--verde-escuro); }#cv2026-painel .stat-tile .st-label { font-size: 12.5px; color: var(--tinta-suave); margin-top: 4px; }#cv2026-painel .callout {
+            background: #FDF6EA; border: 1px solid #F1DFB0; border-radius: var(--raio);
+            padding: 22px 26px; margin: 20px 0; display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+        }#cv2026-painel .callout .co-num { font-size: 34px; font-weight: 800; color: var(--laranja); min-width: 90px; }#cv2026-painel .callout .co-text { font-size: 14.5px; color: var(--tinta); line-height: 1.6; flex: 1; min-width: 220px; }#cv2026-painel footer {
+            text-align: center;
+            padding: 34px 20px;
+            background: var(--superficie);
+            margin-top: 50px;
+            border-top: 1px solid var(--borda);
+        }#cv2026-painel .logo-img { max-height: 50px; }#cv2026-painel .regua-img { max-width: 100%; height: auto; max-height: 64px; margin-top: 16px; }#cv2026-painel footer p { font-size: 12px; color: var(--tinta-suave); margin: 14px 0 0; }#cv2026-painel .foot-note { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* Ajustes extras de responsividade para telas pequenas (adicionado na adaptacao) */
+#cv2026-painel { max-width: 100%; }
+#cv2026-painel header { flex-wrap: wrap; row-gap: 10px; }
+@media (max-width: 600px) {
+    #cv2026-painel header { padding: 16px 18px; }
+    #cv2026-painel header h1 { font-size: 18px; }
+    #cv2026-painel header .subtitle { font-size: 11px; }
+    #cv2026-painel .container { width: 96%; margin: 20px auto; }
+    #cv2026-painel .section-head h2 { font-size: 21px; }
+    #cv2026-painel .card .value { font-size: 28px; }
+    #cv2026-painel .hero-report { padding: 28px 22px; }
+    #cv2026-painel .hero-report h1 { font-size: 22px; }
+    #cv2026-painel .insights-box { padding: 22px; }
+    #cv2026-painel .chart-wrapper { height: 220px; }
+    #cv2026-painel .chart-wrapper.tall { height: 240px; }
+    #cv2026-painel .callout { padding: 18px; }
+    #cv2026-painel .callout .co-num { font-size: 26px; min-width: 70px; }
+}
+</style>
+<div id="cv2026-painel">
+<header>
+        <div class="brand">
+            <div>
+                <h1>Painel de Inscrições &amp; Impacto 2026</h1>
+                <div class="subtitle">Caravana Energia da Cultura — Produtores · Mentorias · Facilitadores · Pesquisadores</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div class="tabs">
+            <div class="tab active" onclick="openTab(event, 'Dashboard')">Panorama Geral</div>
+            <div class="tab" onclick="openTab(event, 'Insights')">Resumo &amp; Insights</div>
+            <div class="tab" onclick="openTab(event, 'Selecionados')">Selecionados Locais</div>
+            <div class="tab" onclick="openTab(event, 'Multicategoria')">Multicategoria</div>
+            <div class="tab" onclick="openTab(event, 'Institucional')">Relatório Institucional</div>
+        </div>
+
+        <!-- ======================= ABA 1: PANORAMA GERAL ======================= -->
+        <div id="Dashboard" class="tab-content active">
+
+            <div class="cards">
+                <div class="card">
+                    <h3>Total de Inscrições</h3>
+                    <div class="value">490</div>
+                    <span class="indicator">Base consolidada · 4 modalidades</span>
+                </div>
+                <div class="card validas">
+                    <h3>Inscrições Enviadas</h3>
+                    <div class="value" style="color: var(--verde);">380</div>
+                    <span class="indicator">78% das inscrições totais</span>
+                </div>
+                <div class="card unicas">
+                    <h3>Pessoas Únicas Enviadas</h3>
+                    <div class="value" style="color: #2f7db5;">288</div>
+                    <span class="indicator">~76% das inscrições enviadas</span>
+                </div>
+                <div class="card nao-enviadas">
+                    <h3>Inscrições Não Enviadas</h3>
+                    <div class="value" style="color: var(--vermelho);">110</div>
+                    <span class="indicator">92 Draft · 18 Abandonadas</span>
+                </div>
+            </div>
+
+            <div class="subhead-row">
+                <h3>Novos indicadores propostos</h3>
+                <span class="tag">Calculados sobre as 288 pessoas únicas enviadas</span>
+            </div>
+            <div class="cards">
+                <div class="card novo">
+                    <h3>Taxa de Multicandidatura</h3>
+                    <div class="value">20,5%</div>
+                    <span class="indicator">59 de 288 pessoas concorreram em +1 modalidade</span>
+                    <p class="desc">Ver detalhamento completo na aba Multicategoria.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Equidade de Gênero</h3>
+                    <div class="value">68,4%</div>
+                    <span class="indicator">Mulheres cis, trans e pessoas não binárias</span>
+                    <p class="desc">197 de 288 pessoas com inscrição enviada.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Representatividade Étnico-Racial</h3>
+                    <div class="value">64,9%</div>
+                    <span class="indicator">Pessoas pretas, pardas e indígenas</span>
+                    <p class="desc">187 de 288 pessoas com inscrição enviada.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Concentração Territorial</h3>
+                    <div class="value">98,6%</div>
+                    <span class="indicator">SP, DF, PE, BA e RN concentram a base</span>
+                    <p class="desc">284 de 288 pessoas nos 5 estados-foco.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Qualificação Técnica</h3>
+                    <div class="value">69,4%</div>
+                    <span class="indicator">Superior completo ou pós-graduação</span>
+                    <p class="desc">200 de 288 pessoas com inscrição enviada.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Base Total de Pessoas</h3>
+                    <div class="value">352</div>
+                    <span class="indicator">Cadastros únicos (todos os status)</span>
+                    <p class="desc">490 inscrições distribuídas entre 352 pessoas.</p>
+                </div>
+            </div>
+
+            <div class="subhead-row">
+                <h3>Funil e distribuição</h3>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-container span-2">
+                    <h3>Funil de Status por Categoria</h3>
+                    <p class="chart-note">Enviada · Draft · Abandonada — 490 inscrições</p>
+                    <div class="chart-wrapper"><canvas id="chartCategorias"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Distribuição Regional</h3>
+                    <p class="chart-note">490 inscrições, por região do Brasil</p>
+                    <div class="chart-wrapper"><canvas id="chartRegiao"></canvas></div>
+                </div>
+
+                <div class="chart-container span-3">
+                    <h3>Curva de Engajamento por Idade</h3>
+                    <p class="chart-note">490 inscrições, por faixa etária</p>
+                    <div class="chart-wrapper tall"><canvas id="chartIdade"></canvas></div>
+                </div>
+
+                <div class="chart-container span-1">
+                    <h3>Identidade de Gênero</h3>
+                    <p class="chart-note">490 inscrições</p>
+                    <div class="chart-wrapper"><canvas id="chartGenero"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Recorte Sociodemográfico: Cor/Raça</h3>
+                    <p class="chart-note">490 inscrições</p>
+                    <div class="chart-wrapper"><canvas id="chartCorRaca"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Inclusão: Deficiência Declarada</h3>
+                    <p class="chart-note">490 inscrições · categorias afirmativas em destaque</p>
+                    <div class="chart-wrapper"><canvas id="chartPCD"></canvas></div>
+                </div>
+
+                <div class="chart-container span-3">
+                    <h3>Nível de Formação Acadêmica</h3>
+                    <p class="chart-note">490 inscrições · ordenado do nível mais alto ao mais baixo</p>
+                    <div class="chart-wrapper"><canvas id="chartFormacao"></canvas></div>
+                </div>
+
+                <div class="chart-container span-3">
+                    <h3>Povos e Comunidades Tradicionais</h3>
+                    <p class="chart-note">490 inscrições · categorias afirmativas em destaque</p>
+                    <div class="chart-wrapper"><canvas id="chartPovos"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ======================= ABA 2: RESUMO & INSIGHTS ======================= -->
+        <div id="Insights" class="tab-content">
+            <div class="section-head">
+                <p class="eyebrow">Aba 2 de 5</p>
+                <h2>Resumo Geral e Principais Insights</h2>
+                <p class="lead">Leitura executiva da base de 490 inscrições (352 pessoas), preparada para o time do projeto e para a Neoenergia.</p>
+            </div>
+
+            <div class="insights-box">
+                <h2>1. Perfil Geral da Demanda</h2>
+                <ul>
+                    <li>A Caravana recebeu <span class="highlight-verde">490 inscrições</span> vindas de <span class="highlight-verde">352 pessoas</span> distintas, com <span class="highlight-verde">380 (78%)</span> efetivamente enviadas. A categoria <strong>Mentorias</strong> foi a mais demandada (203 inscrições), seguida por <strong>Produtores</strong> (152), <strong>Facilitadores</strong> (78) e <strong>Pesquisadores</strong> (57).</li>
+                    <li><strong>Alta especialização comprovada:</strong> entre quem respondeu, a <strong>Pós-graduação (171)</strong> lidera isoladamente as inscrições, à frente do Ensino Superior completo (160). Estamos lidando com um público sênior e altamente qualificado — <span class="highlight">69,4%</span> das pessoas com inscrição enviada têm superior completo ou pós-graduação.</li>
+                    <li><strong>Curva de idade madura:</strong> empate técnico no pico de engajamento entre as faixas de <strong>30 a 34 anos</strong> e <strong>35 a 39 anos</strong> (ambas com 99 inscrições), formando uma curva quase perfeita que atinge a maturidade da carreira dos agentes culturais.</li>
+                </ul>
+            </div>
+
+            <div class="insights-box">
+                <h2>2. Diversidade e Inclusão</h2>
+                <ul>
+                    <li><strong>Equidade de gênero:</strong> <span class="highlight">68,4%</span> das pessoas com inscrição enviada são mulheres cis, mulheres trans ou pessoas não binárias — um retrato consistente com os critérios afirmativos usados no processo seletivo (ver aba Selecionados Locais).</li>
+                    <li><strong>Representatividade étnico-racial:</strong> <span class="highlight">64,9%</span> se autodeclaram pretas, pardas ou indígenas, superando a média de autodeclaração da população brasileira em pesquisas culturais similares.</li>
+                    <li><strong>Diversidade de origem:</strong> apesar de a maioria responder "Não" a pertencimento tradicional, os dados desvendaram grupos cruciais: <strong>Quilombolas (10)</strong>, além de Ribeirinhos, Caiçaras, Ciganos, Sertanejos, Praieiros e Pescadores artesanais.</li>
+                    <li><strong>Acessibilidade e PCD:</strong> entre as pessoas que sinalizaram deficiência, os laudos de <strong>Deficiência Intelectual (5)</strong> e <strong>Física (4)</strong> lideram, exigindo protocolos adequados de acolhimento em formações presenciais.</li>
+                </ul>
+            </div>
+
+            <div class="insights-box">
+                <h2>3. Território</h2>
+                <ul>
+                    <li>A base está fortemente concentrada nos <strong>5 estados-foco</strong> do projeto — <span class="highlight-azul">SP, DF, PE, BA e RN</span> respondem por <span class="highlight">98,6%</span> das pessoas com inscrição enviada — validando a estratégia de descentralização de recursos para fora do eixo tradicional e a abertura da nova fronteira em Pernambuco.</li>
+                    <li>A região <strong>Nordeste</strong> concentra a maior parte das inscrições (244 de 490), puxada por BA, PE e RN — território de maior densidade de Pontos e Pontões de Cultura no recorte usado na metodologia de escolha de municípios.</li>
+                </ul>
+            </div>
+
+            <div class="insights-box">
+                <h2>4. Multicandidatura</h2>
+                <ul>
+                    <li><span class="highlight">21,6%</span> das 352 pessoas da base (76 pessoas) se inscreveram em <strong>mais de uma modalidade</strong> — sinal de um público multidisciplinar que transita entre produção, mentoria, facilitação e pesquisa. O par mais comum é <strong>Mentorias + Produtores</strong> (40 pessoas).</li>
+                    <li>Esse comportamento é ainda mais forte entre os selecionados: <span class="highlight">53,3%</span> das 15 pessoas selecionadas como produtoras/assistentes e pesquisadoras locais haviam se inscrito em mais de uma modalidade — mais que o <strong>dobro</strong> da taxa da base geral. Ver análise completa na aba Multicategoria.</li>
+                </ul>
+            </div>
+
+            <div class="insights-box">
+                <h2>5. Seleção de Talentos Locais</h2>
+                <ul>
+                    <li>No processo de Produtores Locais, <strong>18 pessoas</strong> foram pré-selecionadas para entrevista e <strong>10 foram selecionadas</strong> (5 produtoras/produtores + 5 assistentes de produção), uma por função em cada um dos 5 estados-foco.</li>
+                    <li>No processo de Pesquisadores Locais, <strong>5 pessoas</strong> foram selecionadas dentre as pré-selecionadas para entrevista, uma por estado-foco.</li>
+                    <li>Entre as 15 pessoas selecionadas nos dois processos: <span class="highlight">86,7%</span> são mulheres cis, trans ou não binárias; <span class="highlight">80%</span> se autodeclaram pretas ou pardas; e <span class="highlight">93,3%</span> têm superior completo ou pós-graduação — reflexo direto dos critérios afirmativos de prioridade (mulheres, pessoas negras e pessoas trans) usados na seleção.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- ======================= ABA 3: SELECIONADOS LOCAIS ======================= -->
+        <div id="Selecionados" class="tab-content">
+            <div class="section-head">
+                <p class="eyebrow">Aba 3 de 5</p>
+                <h2>Selecionados: Produtores e Pesquisadores Locais</h2>
+                <p class="lead">Com base no processo descrito em <em>Pesquisadores e produtores locais</em>, que aplicou critérios afirmativos de prioridade (mulheres, pessoas negras e pessoas trans obtiveram pontuação extra), currículo/experiência e territorialidade.</p>
+            </div>
+
+            <div class="subhead-row"><h3>Funil de seleção — Produtores Locais</h3></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value">152</div><div class="st-label">Inscritos na modalidade</div></div>
+                <div class="stat-tile"><div class="st-value">136</div><div class="st-label">Inscrições enviadas</div></div>
+                <div class="stat-tile"><div class="st-value">18</div><div class="st-label">Pré-selecionados p/ entrevista</div></div>
+                <div class="stat-tile"><div class="st-value">10</div><div class="st-label">Selecionados (5 produtores + 5 assistentes)</div></div>
+            </div>
+
+            <div class="subhead-row"><h3>Funil de seleção — Pesquisadores Locais</h3></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value">57</div><div class="st-label">Inscritos na modalidade</div></div>
+                <div class="stat-tile"><div class="st-value">49</div><div class="st-label">Inscrições enviadas</div></div>
+                <div class="stat-tile"><div class="st-value">18</div><div class="st-label">Pré-selecionados p/ entrevista</div></div>
+                <div class="stat-tile"><div class="st-value">5</div><div class="st-label">Selecionados (1 por estado-foco)</div></div>
+            </div>
+            <p class="foot-note">O documento fonte declara 18 pré-selecionados para entrevista de Pesquisadores Locais; a lista nominal explicitada no documento contém 14 nomes (BA 3, DF 2, PE 3, RN 3, SP 3). Mantivemos o número declarado no texto original e sinalizamos a diferença para fins de transparência.</p>
+
+            <div class="subhead-row"><h3>Quem foi selecionado, por estado-foco</h3></div>
+            <div class="uf-grid">
+                <div class="uf-card">
+                    <span class="uf-code">BA</span>
+                    <div class="uf-role"><div class="role-label">Produtora</div><div class="role-name">Renata Maysa Abreu da Costa</div></div>
+                    <div class="uf-role"><div class="role-label">Assistente de Produção</div><div class="role-name">Neusínea Maciel Miranda</div></div>
+                    <div class="uf-role"><div class="role-label">Pesquisadora Local</div><div class="role-name">Juliana Santos da Silva</div></div>
+                </div>
+                <div class="uf-card">
+                    <span class="uf-code">DF</span>
+                    <div class="uf-role"><div class="role-label">Produtora</div><div class="role-name">Loba Makua</div></div>
+                    <div class="uf-role"><div class="role-label">Assistente de Produção</div><div class="role-name">Gislene Sousa Dos Santos Costa</div></div>
+                    <div class="uf-role"><div class="role-label">Pesquisadora Local</div><div class="role-name">Lorena de Oliveira Elias</div></div>
+                </div>
+                <div class="uf-card">
+                    <span class="uf-code">PE</span>
+                    <div class="uf-role"><div class="role-label">Produtor</div><div class="role-name">Joesile Gomes Cordeiro</div></div>
+                    <div class="uf-role"><div class="role-label">Assistente de Produção</div><div class="role-name">Anny Késia Guedes Baracho</div></div>
+                    <div class="uf-role"><div class="role-label">Pesquisadora Local</div><div class="role-name">Mariana Passos</div></div>
+                </div>
+                <div class="uf-card">
+                    <span class="uf-code">RN</span>
+                    <div class="uf-role"><div class="role-label">Produtora</div><div class="role-name">Tatiane Cristina Fernandes</div></div>
+                    <div class="uf-role"><div class="role-label">Assistente de Produção</div><div class="role-name">Jennifer Katarina Miranda Da Silva</div></div>
+                    <div class="uf-role"><div class="role-label">Pesquisador Local</div><div class="role-name">Gláucio Teixeira da Câmara</div></div>
+                </div>
+                <div class="uf-card">
+                    <span class="uf-code">SP</span>
+                    <div class="uf-role"><div class="role-label">Produtora</div><div class="role-name">Fabiana Nascimento</div></div>
+                    <div class="uf-role"><div class="role-label">Assistente de Produção</div><div class="role-name">Katiuscia Marques</div></div>
+                    <div class="uf-role"><div class="role-label">Pesquisadora Local</div><div class="role-name">Cristiane de Almeida Santos</div></div>
+                </div>
+            </div>
+
+            <div class="subhead-row"><h3>Perfil demográfico dos 15 selecionados</h3></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value">86,7%</div><div class="st-label">Mulheres cis, trans ou não binárias</div></div>
+                <div class="stat-tile"><div class="st-value">80%</div><div class="st-label">Pessoas pretas ou pardas</div></div>
+                <div class="stat-tile"><div class="st-value">93,3%</div><div class="st-label">Superior completo ou pós-graduação</div></div>
+                <div class="stat-tile"><div class="st-value">37,1</div><div class="st-label">Idade média (29–50 anos)</div></div>
+                <div class="stat-tile"><div class="st-value">53,3%</div><div class="st-label">Inscritos em mais de 1 modalidade</div></div>
+            </div>
+
+            <div class="table-wrap">
+                <table class="datatable">
+                    <thead>
+                        <tr><th>Nome</th><th>Papel</th><th>UF</th><th class="num">Idade</th><th>Gênero</th><th>Cor/Raça</th><th>Formação</th><th class="num">Nº modalidades</th></tr>
+                    </thead>
+                    <tbody id="tabelaSelecionados"></tbody>
+                </table>
+            </div>
+            <p class="foot-note">Dados cruzados por CPF entre a lista de selecionados (documento "Pesquisadores e produtores locais") e a base consolidada de inscrições (DB_Inscritos).</p>
+        </div>
+
+        <!-- ======================= ABA 4: MULTICATEGORIA ======================= -->
+        <div id="Multicategoria" class="tab-content">
+            <div class="section-head">
+                <p class="eyebrow">Aba 4 de 5</p>
+                <h2>Inscritos e Selecionados em Mais de Uma Modalidade</h2>
+                <p class="lead">Quantas pessoas concorreram — e foram selecionadas — em mais de uma das 4 modalidades da Caravana (Produtores, Mentorias, Facilitadores, Pesquisadores).</p>
+            </div>
+
+            <div class="callout">
+                <div class="co-num">53,3%</div>
+                <div class="co-text">dos <strong>selecionados</strong> como produtores/assistentes e pesquisadores locais haviam se inscrito em mais de uma modalidade — mais que o <strong>dobro</strong> da taxa observada na base geral de inscritos (<strong>21,6%</strong>). Multicandidatura é um sinal forte de qualificação e engajamento, e correlaciona com maior chance de seleção.</div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-container span-1">
+                    <h3>Nº de modalidades por pessoa</h3>
+                    <p class="chart-note">352 pessoas (todos os status)</p>
+                    <div class="chart-wrapper"><canvas id="chartNumCategorias"></canvas></div>
+                </div>
+                <div class="chart-container span-2">
+                    <h3>Combinações de modalidades mais comuns</h3>
+                    <p class="chart-note">Entre as 76 pessoas com mais de 1 modalidade</p>
+                    <div class="chart-wrapper"><canvas id="chartPares"></canvas></div>
+                </div>
+            </div>
+
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value">352</div><div class="st-label">Pessoas na base (todos os status)</div></div>
+                <div class="stat-tile"><div class="st-value">76</div><div class="st-label">Em mais de 1 modalidade (21,6%)</div></div>
+                <div class="stat-tile"><div class="st-value">9</div><div class="st-label">Inscritas nas 4 modalidades</div></div>
+                <div class="stat-tile"><div class="st-value">40</div><div class="st-label">Combinação mais comum: Mentorias + Produtores</div></div>
+            </div>
+            <p class="foot-note">Considerando apenas inscrições efetivamente enviadas (288 pessoas), a taxa de multicandidatura é de 20,5% (59 pessoas), com distribuição semelhante entre as combinações.</p>
+
+            <div class="subhead-row"><h3>Os 8 selecionados que concorreram em mais de uma modalidade</h3></div>
+            <div class="table-wrap">
+                <table class="datatable">
+                    <thead>
+                        <tr><th>Nome</th><th>Selecionado(a) como</th><th>UF</th><th>Também se inscreveu em</th></tr>
+                    </thead>
+                    <tbody id="tabelaMultiSelecionados"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ======================= ABA 5: RELATÓRIO INSTITUCIONAL ======================= -->
+        <div id="Institucional" class="tab-content">
+            <div class="hero-report">
+                <p class="eyebrow">Relatório Institucional · 1ª Fase 2026</p>
+                <h1>Caravana Energia da Cultura 2026: Estratégia, Impacto e Escala</h1>
+                <p>Transformando o mercado cultural brasileiro com inteligência, previsibilidade e excelência logística. Patrocínio Neoenergia, produção Sorella, realização Cultura&amp;Mercado, Ministério da Cultura e Governo Federal do Brasil.</p>
+                <div class="hero-stats">
+                    <div><div class="hs-value">490</div><div class="hs-label">Inscrições recebidas</div></div>
+                    <div><div class="hs-value">352</div><div class="hs-label">Pessoas alcançadas</div></div>
+                    <div><div class="hs-value">5</div><div class="hs-label">Territórios-foco</div></div>
+                    <div><div class="hs-value">260h+</div><div class="hs-label">Capacitação prevista em 2026</div></div>
+                </div>
+            </div>
+
+            <article class="report">
+                <h2>1. Histórico: a força de 2024–2025</h2>
+                <p>A Caravana chega a 2026 com dois anos de execução consolidada. Em 2024, o projeto entregou <strong>48 horas de formação presencial intensiva</strong> em quatro territórios (DF, BA, RN, SP). Em 2025, a atuação se aprofundou com <strong>96 horas de aulas e atividades culturais presenciais</strong>, expandindo conexões criativas, e <strong>80 horas de mentoria online</strong> dedicadas a 25 grupos selecionados, garantindo aplicação prática dos conteúdos na Lei Rouanet.</p>
+
+                <h2>2. O salto estratégico para 2026</h2>
+                <p>Para 2026, a estratégia se apoia em quatro pilares:</p>
+                <ul>
+                    <li><strong>Descentralização de recursos:</strong> foco no fomento fora do eixo tradicional Rio–São Paulo.</li>
+                    <li><strong>Nova fronteira:</strong> expansão inédita para Pernambuco, ampliando a força da Caravana no Nordeste.</li>
+                    <li><strong>Empreendedorismo sustentável:</strong> capacitação para autonomia financeira no setor cultural.</li>
+                    <li><strong>Inclusão prioritária:</strong> fomento direto ao acesso de mulheres cis, trans e negras às formações.</li>
+                </ul>
+                <p>Os territórios de impacto em 2026 são <strong>Bahia, Distrito Federal, Pernambuco, Rio Grande do Norte e São Paulo</strong> — os mesmos 5 estados que concentram 98,6% da base de inscritos recebida nesta primeira fase.</p>
+
+                <h2>3. O ecossistema de formação 2026</h2>
+                <p>A entrega de conteúdo em 2026 é organizada em quatro eixos complementares, somando mais de <strong>260 horas de capacitação</strong>:</p>
+                <ul>
+                    <li><strong>Eixo 1 — Mentorias (profundidade):</strong> 70h de mentoria online (abril–setembro) para 5 coletivos selecionados por estado, com especialistas fixos em burocracia/contratação, organização de coletivos e PNAB, com foco em preparação para a Lei Rouanet e editais locais.</li>
+                    <li><strong>Eixo 2 — Workshops (conexão presencial):</strong> 30h de workshops presenciais (6h por localidade), com abertura oficial de "conexões criativas" e contratação de mediadores e produtores locais em cada território.</li>
+                    <li><strong>Eixo 3 — Pílulas de conhecimento (escala nacional):</strong> aulas curtas no YouTube (lançamento em junho), 4 a 5 pílulas dinâmicas de até 20 minutos, com LIBRAS e legenda, cobrindo temas universais (Inteligência Artificial, acessibilidade, financiamento público, políticas nacionais).</li>
+                    <li><strong>Eixo 4 — Aulas síncronas (capacitação de massa):</strong> 60h de aulas síncronas (julho–setembro), 500 vagas disputadas em 5 turmas de 100 pessoas, 12h por estado, com emissão de certificado para quem cumprir 75% de presença mínima.</li>
+                </ul>
+
+                <h2>4. Inteligência logística: um cronograma desenhado para o Brasil de 2026</h2>
+                <p>2026 é um ano atípico — festividades juninas gigantescas no Nordeste, Copa do Mundo (11 de junho a 19 de julho) e Eleições Nacionais em outubro disputam a atenção do país. A programação da Caravana foi desenhada para complementar, e não competir, com esse calendário:</p>
+                <ul>
+                    <li><strong>1º semestre (abril–maio):</strong> workshops presenciais (Eixo 2) concluídos na Bahia, Pernambuco e Rio Grande do Norte <em>antes</em> da explosão turística e logística do "Maior São João do Mundo" (Caruaru) e do Mossoró Cidade Junina — otimizando custos de passagens/hospedagem e captando atenção integral dos agentes culturais antes da alta temporada.</li>
+                    <li><strong>Mês da Copa (junho):</strong> lançamento nacional do Eixo 3 (YouTube) e execução do Eixo 2 presencial apenas em São Paulo e Distrito Federal — territórios sem tradição de paralisar o ecossistema cultural em junho. Nos estados tomados pelas festas e pelos jogos, a entrega migra para o formato sob demanda.</li>
+                    <li><strong>2º semestre (julho–setembro):</strong> inscrições em julho, execução pesada do Eixo 4 (aulas síncronas) e conclusão do Eixo 1 (mentorias) em agosto e setembro — toda a carga horária de massa é executada e certificada <em>antes</em> do primeiro turno das eleições (4 de outubro), garantindo 100% de aproveitamento antes que o país seja tomado pelo debate político e trocas de gestão pública.</li>
+                </ul>
+
+                <h2>5. Governança e a máquina por trás do projeto</h2>
+                <ul>
+                    <li><strong>Coordenação e curadoria pedagógica:</strong> Larissa Biasoli, Daniele Torres e Carolina Kazumi.</li>
+                    <li><strong>Governança e segurança (Inter Medium):</strong> assessoria jurídica (Carolina Kazumi), contábil e financeira (Giselle Bastos) e produção executiva (Lívia Carmona).</li>
+                    <li><strong>Acessibilidade integral (Inter Medium):</strong> especialistas dedicados em LIBRAS, audiodescrição e acessibilidade física.</li>
+                    <li><strong>Inovação em dados (Inter Medium):</strong> núcleo de engajamento, Cult_B e Inteligência Avaliativa (Gustavo Valezzi e Carol Zanoti).</li>
+                </ul>
+                <h4>Legado tecnológico: Cult_B e Inteligência Avaliativa</h4>
+                <p>O <strong>Cult_B</strong> automatiza o controle de presença presencial e a emissão de certificados, e constrói uma rede digital ativa entre os participantes. A <strong>Inteligência Avaliativa</strong> mescla e processa os dados de 2024, 2025 e 2026 para gerar relatórios públicos em tempo real sobre o impacto e a evolução do setor cultural brasileiro — este painel é parte desse legado.</p>
+
+                <hr class="divider">
+
+                <h2>6. Metodologia de escolha dos municípios e indicadores ODS</h2>
+                <p>A escolha dos municípios da Caravana 2026 combina bases de dados públicas e privadas: a Estimativa da População do IBGE (atualizada em 13/01/2026), a base do <strong>IDSC-BR 2025</strong> (Índice de Desenvolvimento Sustentável das Cidades) e a base de Pontos e Pontões de Cultura da Rede Cultura Viva, cruzadas com dados fornecidos pela Neoenergia — estados-foco da Caravana, cidades-praça de atuação da empresa e municípios do Edital Neoenergia 2026.</p>
+
+                <h4>6.1 Seis critérios de elegibilidade</h4>
+                <p>Um município só é elegível se atender simultaneamente a todos os critérios abaixo (valor 1 em cada um):</p>
+                <ul>
+                    <li><strong>Critério 1:</strong> população igual ou superior a 100.000 habitantes;</li>
+                    <li><strong>Critério 2:</strong> não ser Capital de Estado;</li>
+                    <li><strong>Critério 3:</strong> pertencer a um dos Estados-foco da Caravana 2026;</li>
+                    <li><strong>Critério 4:</strong> pertencer às praças onde a Neoenergia tem atuação;</li>
+                    <li><strong>Critério 5:</strong> não fazer parte do Edital Neoenergia 2026 (para evitar sobreposição de fomento);</li>
+                    <li><strong>Critério 6:</strong> ter média de Pontos de Cultura por 100.000 habitantes igual ou superior à média nacional de referência (2,58 pontos/100 mil habitantes).</li>
+                </ul>
+
+                <h4>6.2 Ajuste fino: o Índice Final ODS Caravana</h4>
+                <p>Entre os municípios elegíveis, um segundo cálculo usa a base do IDSC para trazer os <strong>Objetivos de Desenvolvimento Sustentável (ODS)</strong> impactados pela Caravana, com indicadores específicos por ODS. Cada indicador recebe 1,00 ponto se estiver no lado favorável da média nacional, 0,50 se estiver no intervalo intermediário (entre 80% e 100% da média) e 0,00 caso contrário — o Índice Final ODS Caravana é a média desses valores, usado como critério de desempate entre municípios já elegíveis pelos 6 critérios iniciais. Os ODS e indicadores selecionados são:</p>
+                <div class="table-wrap">
+                    <table class="datatable">
+                        <thead><tr><th>ODS</th><th>Indicador</th><th>O que mede</th></tr></thead>
+                        <tbody>
+                            <tr><td rowspan="1"><span class="pill pill-verde">ODS 7</span></td><td>SDG7_2_ENRG</td><td>Domicílios com acesso à energia elétrica (%)</td></tr>
+                            <tr><td rowspan="2"><span class="pill pill-azul">ODS 8</span></td><td>SDG8_3_T_DSC</td><td>Taxa de desemprego</td></tr>
+                            <tr><td>SDG8_9_T_OCUP_FORM</td><td>Taxa de ocupação formal (16+ anos)</td></tr>
+                            <tr><td rowspan="4"><span class="pill pill-laranja">ODS 10</span></td><td>SDG10_2_GINI</td><td>Coeficiente de Gini (desigualdade de renda)</td></tr>
+                            <tr><td>SDG10_DIF_FEM_NNN</td><td>Diferença na taxa de feminicídio entre mulheres PPI e brancas</td></tr>
+                            <tr><td>SDG10_HM_JUV_NNN</td><td>Diferença na taxa de homicídio juvenil masculino entre jovens PPI e brancos</td></tr>
+                            <tr><td>SDG10_35_VLC_LGBT</td><td>Violência contra população LGBTQIAPN+ (por 100 mil hab.)</td></tr>
+                            <tr><td rowspan="2"><span class="pill pill-verde">ODS 11</span></td><td>SDG11_5_DMC_FVL</td><td>Domicílios em favelas e comunidades urbanas (%)</td></tr>
+                            <tr><td>SDG11_6_NGR_SUBN</td><td>População preta e parda em favelas e comunidades urbanas (%)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p>Após os 6 critérios e o Índice ODS, o time do projeto ainda pode aplicar critérios de desempate adicionais, como a distância do município à capital do estado e a quantidade de agentes de cultura registrados no território.</p>
+
+                <blockquote class="pull">A metodologia não escolhe apenas "onde a energia chega" — ela prioriza municípios de médio porte, fora das capitais, com maior desigualdade de renda (ODS 10), menor acesso à ocupação formal (ODS 8) e maior necessidade de inclusão urbana (ODS 11).</blockquote>
+
+                <h4>6.3 A ligação entre a metodologia e quem a Caravana de fato alcançou</h4>
+                <p>Os critérios de elegibilidade dão peso explícito a indicadores de renda (Gini), raça (diferenças PPI x brancos em feminicídio e homicídio juvenil) e urbanização precária (favelas e comunidades). Essa orientação se reflete diretamente no perfil de quem se inscreveu e de quem foi selecionado nesta primeira fase:</p>
+                <ul>
+                    <li><strong>Raça:</strong> 64,9% das pessoas com inscrição enviada — e 80% das pessoas selecionadas como produtoras/assistentes e pesquisadoras locais — se autodeclaram pretas, pardas ou indígenas, na mesma direção do peso dado à desigualdade racial (ODS 10) na metodologia.</li>
+                    <li><strong>Gênero:</strong> 68,4% da base enviada e 86,7% das pessoas selecionadas são mulheres cis, trans ou não binárias, coerente com o indicador de diferença na taxa de feminicídio (ODS 10) usado na escolha dos municípios e com os critérios afirmativos explícitos do processo seletivo (mulheres, pessoas negras e pessoas trans obtiveram pontuação extra).</li>
+                    <li><strong>Escolaridade/renda (proxy):</strong> 69,4% da base enviada e 93,3% das pessoas selecionadas têm superior completo ou pós-graduação — um público qualificado que a Caravana passa a formalizar e conectar a oportunidades de renda (Lei Rouanet, editais locais), endereçando o hiato de ocupação formal (ODS 8) apontado pela metodologia.</li>
+                    <li><strong>Território:</strong> a concentração de 98,6% da base nos 5 estados-foco (SP, DF, PE, BA, RN) confirma que a etapa de captação de inscritos seguiu fielmente os territórios definidos pela metodologia de escolha de municípios.</li>
+                </ul>
+
+                <hr class="divider">
+
+                <h2>7. Resultados desta primeira fase (inscrições 2026)</h2>
+                <ul>
+                    <li><strong>490 inscrições</strong> recebidas, <strong>380 enviadas (78%)</strong>, vindas de <strong>352 pessoas</strong> distintas — <strong>288</strong> delas com inscrição enviada.</li>
+                    <li><strong>21,6%</strong> da base concorreu em mais de uma modalidade, sinal de um público multidisciplinar; entre os selecionados, essa taxa sobe para <strong>53,3%</strong>.</li>
+                    <li>Processo seletivo de Produtores e Pesquisadores Locais concluído: <strong>15 pessoas selecionadas</strong> (10 na produção local + 5 na pesquisa local), uma dupla/pessoa por estado-foco, com <strong>86,7%</strong> de mulheres, <strong>80%</strong> de pessoas pretas/pardas e <strong>93,3%</strong> com superior completo ou mais.</li>
+                </ul>
+
+                <h2>8. Transparência e controle de desafios</h2>
+                <p>O time do projeto já mapeou os principais riscos operacionais de 2026 e as respectivas mitigações:</p>
+                <ul>
+                    <li><strong>Engajamento e quebra de presença:</strong> comunicação massiva e segmentada para garantir turmas cheias e ativas do início ao fim.</li>
+                    <li><strong>Operação em múltiplos fuso-territórios:</strong> contratação local antecipada (desde março) de produtores, monitores e pesquisadores, garantindo enraizamento territorial.</li>
+                    <li><strong>Abertura de nova fronteira (PE):</strong> mapeamento intensivo e parcerias locais estratégicas para garantir sucesso imediato no novo estado.</li>
+                </ul>
+
+                <h2>9. Fechamento</h2>
+                <blockquote class="pull">Mais de 260 horas de capacitação. 5 territórios. Um ano histórico. Estamos prontos para transformar o mercado cultural brasileiro com inteligência e previsibilidade. Vamos juntos construir este legado.</blockquote>
+            </article>
+        </div>
+
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            document.getElementById('cv2026-painel').querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById('cv2026-painel').querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+
+        const colors = {
+            verde: '#009B39', verdeEscuro: '#12422B', azul: '#52A2DA', laranja: '#F59C00',
+            vermelho: '#E74C3C', muted: '#C9C4BB', tinta: '#2B2B27'
+        };
+
+        const globalOptions = {
+            maintainAspectRatio: false,
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom', labels: { color: colors.tinta, font: { family: 'Barlow', weight: '600' } } },
+                tooltip: { backgroundColor: colors.verdeEscuro, titleFont: { family: 'Barlow' }, bodyFont: { family: 'Barlow' } }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: colors.tinta } },
+                y: { grid: { color: '#EFE9DC' }, ticks: { color: colors.tinta } }
+            }
+        };
+        const noLegend = { legend: { display: false } };
+
+        // 1. Funil de Status por Categoria (cores de status: verde=enviada, laranja=draft, vermelho=abandonada)
+        new Chart(document.getElementById('chartCategorias').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Produtores', 'Mentorias', 'Facilitadores', 'Pesquisadores'],
+                datasets: [
+                    { label: 'Enviada', data: [136, 133, 62, 49], backgroundColor: colors.verde, borderRadius: 4 },
+                    { label: 'Draft', data: [11, 64, 11, 6], backgroundColor: colors.laranja, borderRadius: 4 },
+                    { label: 'Abandonada', data: [5, 6, 5, 2], backgroundColor: colors.vermelho, borderRadius: 4 }
+                ]
+            },
+            options: { ...globalOptions, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { display: false } } } }
+        });
+
+        // 2. Distribuição Regional — barra horizontal de hue único (nominal, sem ordem natural)
+        new Chart(document.getElementById('chartRegiao').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Nordeste', 'Centro-Oeste', 'Sudeste', 'Não informado', 'Norte', 'Sul'],
+                datasets: [{ data: [244, 123, 115, 5, 2, 1], backgroundColor: colors.azul, borderRadius: 4 }]
+            },
+            options: { ...globalOptions, indexAxis: 'y', plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 3. Curva de Idade — série única
+        new Chart(document.getElementById('chartIdade').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Até 19', '20 a 24', '25 a 29', '30 a 34', '35 a 39', '40 a 44', '45 a 49', '50 a 54', '55 a 59', '60 a 64', '65 a 69', 'S/ Resposta'],
+                datasets: [{
+                    label: 'Inscrições por faixa etária',
+                    data: [2, 22, 59, 99, 99, 92, 46, 32, 18, 13, 2, 6],
+                    backgroundColor: 'rgba(82, 162, 218, 0.18)', borderColor: colors.azul,
+                    fill: true, tension: 0.35, borderWidth: 2, pointRadius: 3, pointBackgroundColor: colors.azul
+                }]
+            },
+            options: { ...globalOptions, plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 4. Gênero — hue único, nominal
+        new Chart(document.getElementById('chartGenero').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Mulher Cis', 'Homem Cis', 'Não informado', 'Não binária', 'Mulher Trans'],
+                datasets: [{ data: [312, 130, 28, 14, 6], backgroundColor: colors.verde, borderRadius: 4 }]
+            },
+            options: { ...globalOptions, indexAxis: 'y', plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 5. Cor/Raça — hue único, nominal
+        new Chart(document.getElementById('chartCorRaca').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Preta', 'Parda', 'Branca', 'Não informado', 'Amarela', 'Indígena'],
+                datasets: [{ data: [157, 156, 138, 30, 5, 4], backgroundColor: colors.laranja, borderRadius: 4 }]
+            },
+            options: { ...globalOptions, indexAxis: 'y', plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 6. PCD — base majoritária em cinza-mudo, categorias afirmativas em destaque (laranja)
+        new Chart(document.getElementById('chartPCD').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Não sou', 'Não informado', 'Intelectual', 'Física', 'Múltipla'],
+                datasets: [{
+                    data: [456, 22, 5, 4, 3],
+                    backgroundColor: [colors.muted, colors.muted, colors.laranja, colors.laranja, colors.laranja],
+                    borderRadius: 4
+                }]
+            },
+            options: { ...globalOptions, plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 7. Formação — rampa ordinal de um único matiz (verde), do nível mais alto ao mais baixo
+        new Chart(document.getElementById('chartFormacao').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Pós-graduação', 'Superior completo', 'Superior incompleto', 'Médio completo', 'Médio incompleto', 'Não informado'],
+                datasets: [{
+                    data: [171, 160, 105, 27, 4, 23],
+                    backgroundColor: ['#0B3D22', '#0F6B36', '#009B39', '#5CC98B', '#A8E4C0', colors.muted],
+                    borderRadius: 4
+                }]
+            },
+            options: { ...globalOptions, indexAxis: 'y', plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 8. Povos Tradicionais — base majoritária em cinza-mudo, categorias afirmativas em destaque (laranja)
+        new Chart(document.getElementById('chartPovos').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Não pertence', 'Não sabe', 'Não informado', 'Quilombolas', 'Caiçaras', 'Ribeirinhos', 'Ciganos', 'Praieiros', 'Sertanejos', 'Outros cruzamentos'],
+                datasets: [{
+                    data: [395, 46, 22, 10, 3, 3, 3, 2, 2, 4],
+                    backgroundColor: [colors.muted, colors.muted, colors.muted, colors.laranja, colors.laranja, colors.laranja, colors.laranja, colors.laranja, colors.laranja, colors.laranja],
+                    borderRadius: 4
+                }]
+            },
+            options: { ...globalOptions, indexAxis: 'y', plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 9. Multicategoria: nº de modalidades por pessoa — rampa ordinal
+        new Chart(document.getElementById('chartNumCategorias').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['1 modalidade', '2 modalidades', '3 modalidades', '4 modalidades'],
+                datasets: [{
+                    data: [276, 48, 19, 9],
+                    backgroundColor: ['#A8E4C0', '#5CC98B', '#0F6B36', '#0B3D22'],
+                    borderRadius: 4
+                }]
+            },
+            options: { ...globalOptions, plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // 10. Multicategoria: pares mais comuns — hue único
+        new Chart(document.getElementById('chartPares').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Mentorias + Produtores', 'Facilitadores + Produtores', 'Facilitadores + Mentorias', 'Pesquisadores + Produtores', 'Facilitadores + Pesquisadores', 'Mentorias + Pesquisadores'],
+                datasets: [{ data: [40, 34, 26, 24, 21, 14], backgroundColor: colors.azul, borderRadius: 4 }]
+            },
+            options: { ...globalOptions, indexAxis: 'y', plugins: { ...globalOptions.plugins, ...noLegend } }
+        });
+
+        // Tabela: perfil dos 15 selecionados (Produtores + Pesquisadores Locais)
+        const selecionados = [
+            ["Renata Maysa Abreu da Costa","Produtora","BA",35,"Mulher Cis","Parda","Superior completo",1],
+            ["Neusínea Maciel Miranda","Assistente de Produção","BA",32,"Mulher Cis","Preta","Superior completo",3],
+            ["Loba Makua","Produtora","DF",33,"Não binária","Preta","Superior completo",2],
+            ["Gislene Sousa Dos Santos Costa","Assistente de Produção","DF",47,"Mulher Cis","Preta","Superior completo",1],
+            ["Joesile Gomes Cordeiro","Produtor","PE",29,"Homem Cis","Preta","Pós-graduação",1],
+            ["Anny Késia Guedes Baracho","Assistente de Produção","PE",37,"Mulher Cis","Preta","Superior completo",1],
+            ["Tatiane Cristina Fernandes","Produtora","RN",50,"Mulher Cis","Parda","Pós-graduação",3],
+            ["Jennifer Katarina Miranda Da Silva","Assistente de Produção","RN",29,"Mulher Cis","Branca","Pós-graduação",4],
+            ["Fabiana Nascimento","Produtora","SP",44,"Mulher Cis","Preta","Superior completo",2],
+            ["Katiuscia Marques Da Silva","Assistente de Produção","SP",43,"Mulher Cis","Branca","Pós-graduação",1],
+            ["Juliana Santos da Silva","Pesquisadora Local","BA",33,"Mulher Cis","Parda","Pós-graduação",1],
+            ["Lorena de Oliveira Elias","Pesquisadora Local","DF",32,"Mulher Cis","Branca","Pós-graduação",1],
+            ["Mariana Passos","Pesquisadora Local","PE",33,"Mulher Cis","Preta","Superior incompleto",3],
+            ["Gláucio Teixeira da Câmara","Pesquisador Local","RN",44,"Homem Cis","Preta","Superior completo",3],
+            ["Cristiane de Almeida Santos","Pesquisadora Local","SP",35,"Mulher Cis","Parda","Pós-graduação",3]
+        ];
+        const tbodySel = document.getElementById('tabelaSelecionados');
+        selecionados.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td class="num">${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td class="num">${r[7]}</td>`;
+            tbodySel.appendChild(tr);
+        });
+
+        // Tabela: selecionados com múltiplas modalidades
+        const multiSel = [
+            ["Neusínea Maciel Miranda","Assistente de Produção (Produtores)","BA","Facilitadores, Mentorias"],
+            ["Loba Makua","Produtora (Produtores)","DF","Mentorias"],
+            ["Tatiane Cristina Fernandes","Produtora (Produtores)","RN","Facilitadores, Mentorias"],
+            ["Jennifer Katarina Miranda Da Silva","Assistente de Produção (Produtores)","RN","Facilitadores, Mentorias, Pesquisadores"],
+            ["Fabiana Nascimento","Produtora (Produtores)","SP","Pesquisadores"],
+            ["Mariana Passos","Pesquisadora Local (Pesquisadores)","PE","Facilitadores, Mentorias, Produtores"],
+            ["Gláucio Teixeira da Câmara","Pesquisador Local (Pesquisadores)","RN","Facilitadores, Mentorias, Produtores"],
+            ["Cristiane de Almeida Santos","Pesquisadora Local (Pesquisadores)","SP","Mentorias, Produtores"]
+        ];
+        const tbodyMulti = document.getElementById('tabelaMultiSelecionados');
+        multiSel.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td>`;
+            tbodyMulti.appendChild(tr);
+        });
+    </script>
+</div>
+<!-- ===== FIM: Painel Caravana Energia da Cultura 2026 ===== -->
