@@ -1,0 +1,6 @@
+# Dados pessoais (CPF, e-mail, telefone): nunca versionar. Manter apenas localmente.
+data/*.xlsx
+data/*.xls
+data/*.csv
+*.xlsx
+.DS_Store

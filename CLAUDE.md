@@ -76,7 +76,7 @@ publicar no WordPress é uma ação manual do usuário, feita fora do GitHub.
 ## Dados-fonte
 
 Os dados usados no painel vêm da pasta `data/`:
-- `DB_Inscritos_Caravana2026.xlsx` (aba `DB_Inscritos` — base consolidada de inscrições)
+- `DB_Inscritos_Caravana2026.xlsx` (aba `DB_Inscritos` — base consolidada de inscrições). **Fica apenas na máquina local (ignorada pelo `.gitignore`)**: contém CPF, e-mail e telefone e o repositório é público. Foi removida do repositório e do histórico em 06/10/2026; nunca commitar planilhas com dados pessoais.
 - `Pesquisadores_produtores_locais.pdf` (processo de seleção de talentos locais)
 - `Metodologia_Escolha_Municipios_Caravana2026.pdf` (metodologia ODS de escolha de municípios)
 - `Caravana_Energia_2026_Strategic_Impact.pdf` (histórico, estratégia e eixos de formação)
