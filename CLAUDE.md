@@ -85,3 +85,27 @@ Os dados usados no painel vêm da pasta `data/`:
 A paleta de cores (`--verde: #009B39`, `--verde-escuro: #12422B`, `--azul: #52A2DA`,
 `--laranja: #F59C00`, `--fundo: #FFF9F4`) e a fonte Barlow são oficiais e não devem
 ser alteradas sem nova orientação de identidade visual.
+
+## Painel de Execução 2026 (segundo painel, mesmo local de publicação)
+
+Painel das formações executadas: aulas síncronas online (SP, PE, DF, BA), workshops
+presenciais, mentorias online, trilha do participante (cruzamento com a base de
+inscrições) e relatório institucional. Mesmo design do painel de inscrições.
+
+- **GitHub Pages:** `formacoes.html` na raiz (`.../painel-caravana-2026/formacoes.html`),
+  com link cruzado para `index.html` (o `index.html` ainda não aponta para ele).
+- **Dados:** `BaseDeDados_Aulas_Workshops_Mentorias.xlsx` (abas BaseSP, BasePE, BaseDF,
+  BaseBA, BaseWorkshops, BaseMentorias) + `data/DB_Inscritos_Caravana2026.xlsx`.
+  A planilha de formações **não é commitada** (contém dados pessoais); o repositório é
+  público, então publique somente agregados.
+- **Atualizar números:** `python3 scripts/build_formacoes.py --exec <xlsx> --db data/DB_Inscritos_Caravana2026.xlsx --out /tmp/dados.json --html formacoes.html`
+  (só substitui o JSON embutido; o JSON publicado não tem nome, CPF, e-mail nem telefone).
+- **Texto narrativo e relatório:** os números do texto são ligados ao JSON (`data-v`), mas a
+  interpretação (pontos positivos/melhoria, recomendações, notas de leitura) está escrita à mão
+  no HTML — revisar a cada atualização de dados.
+- **Cruzamentos:** aulas por CPF; mentorias (sem CPF) por e-mail e, na falta, nome normalizado;
+  workshops são formulários anônimos (só análise por território).
+- **Elementor:** `python3 scripts/gerar_elementor_execucao.py` gera
+  `wordpress/painel-execucao-2026-elementor.html` (wrapper `#cv2026-execucao`, mesmas 7 regras
+  acima; a logo, a régua e o rodapé são removidos). Colar num novo widget HTML do Elementor,
+  em página própria (sugestão: subitem de "Inteligência Avaliativa", ao lado de "Inscrições & Impacto 2026").
