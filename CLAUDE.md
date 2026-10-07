@@ -119,10 +119,15 @@ A versão reduzida é **derivada** da completa; nunca edite `formacoes.html` à 
   no HTML — revisar a cada atualização de dados.
 - **Horas de Mentoria dos workshops:** 6h por localidade, divididas pelos dias de workshop
   (1 dia = 6h; 2 dias = 3h por dia; 3 dias = 2h por dia).
-- **Workshops, inscrições e certificados:** vêm da aba `BaseInscricaoWorkshops` (por CPF; coluna
-  `Certificado` = Sim define quem foi certificado). Valores numéricos soltos (30, 35) em campos de perfil
-  são tratados como "sem resposta". A coluna `Selecionados/Remanescentes` não é usada (significado a confirmar).
-  As avaliações (notas I–XV, comentários) vêm da aba `BaseAvaliacaoWorkshops` e seguem anônimas.
+- **Workshops, inscrições e certificados:** vêm da aba `BaseInscricaoWorkshops`, sempre **por localidade**
+  (coluna `Localidade`). Certificado = linhas com `Certificado` = Sim (coluna E), contadas uma vez por pessoa em
+  cada localidade (hoje: 270, igual à contagem direta da planilha; uma pessoa certificada em 2 localidades
+  conta 2). Pessoa = CPF válido (11 dígitos); CPF inválido (30, 35, vazio) usa o nome como chave. Números soltos
+  (30, 35) em campos de perfil são tratados como "sem resposta". A coluna `Selecionados/Remanescentes` não é
+  usada (significado a confirmar). As avaliações (notas I–XV, comentários) vêm da aba `BaseAvaliacaoWorkshops`
+  (coluna `Localidade` = A) e seguem anônimas.
+- **Certificados das aulas síncronas:** coluna `CERTIFICADO` = Sim (só SP e DF a preenchem: 31 + 11 = 42; regra
+  observada: 10h ou mais de 12h). PE, BA e RN ainda sem apuração (aulas parciais / base só com inscrições).
 - **Rótulos dos itens do formulário de workshops:** vêm do PDF "Rótulos Avaliações Workshops"
   (constante `ROTULOS_WORKSHOP` em `scripts/build_formacoes.py`). Item XIV: resposta correta Sim;
   item XV: resposta correta Não (a página mostra % de acertos).

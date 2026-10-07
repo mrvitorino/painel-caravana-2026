@@ -265,9 +265,20 @@ def aulas_block(a, planned, key):
             cs = person_table(sub[sub['CERTIFICADO'] == 'Sim'])
             out['cert_sim'] = len(cs)
             out['cert_pct_participantes'] = pct(len(cs), len(part))
+            out['cert_pct_inscritos'] = pct(len(cs), len(env_people))
             out['cert_ge_min'] = int((part.h >= CERT_MIN_H).sum())
         else:
             out['cert_sim'] = None
+    if key == 'ALL' and 'CERTIFICADO' in sub.columns:
+        # conjunto: certificados dos territórios com a coluna CERTIFICADO preenchida (hoje SP e DF)
+        com_cert = sorted(t for t in sub.terr.unique() if sub[sub.terr == t]['CERTIFICADO'].notna().any())
+        cs = person_table(sub[sub['CERTIFICADO'] == 'Sim'])
+        base = person_table(sub[(sub.status_g == 'enviada') & sub.terr.isin(com_cert)])
+        out['cert_disponivel'] = bool(com_cert)
+        out['cert_territorios'] = com_cert
+        out['cert_sim'] = len(cs)
+        out['cert_pct_inscritos'] = pct(len(cs), len(base))
+        out['cert_por_territorio'] = {t: int(person_table(sub[(sub.terr == t) & (sub['CERTIFICADO'] == 'Sim')]).shape[0]) for t in com_cert}
     pdm, e = perfil_demografico(env_people, key)
     out.update(pdm)
     return out, e
@@ -495,8 +506,9 @@ def load_inscricoes_workshops(path):
         w[c] = w[c].map(lambda v: np.nan if (pd.isna(v) or re.fullmatch(r'\d+(\.0)?', str(v).strip())) else str(v).strip())
     w['UF Inscrito'] = w['UF Inscrito'].map(lambda v: v.upper() if isinstance(v, str) and v.upper() in UFS_VALIDAS else np.nan)
     w['terr'] = w['Localidade'].str[:2]
+    # chave da pessoa: CPF válido (11 dígitos); quando o CPF veio inválido (30, 35 ou vazio), usa o nome
     cpf = w['CPF Inscrito'].map(digits)
-    w['cpf'] = [c if isinstance(c, str) and c else 'sem-cpf:' + nz(n) for c, n in zip(cpf, w['Nome'])]
+    w['cpf'] = [c if isinstance(c, str) and len(c) == 11 else 'sem-cpf:' + nz(n) for c, n in zip(cpf, w['Nome'])]
     w['status_g'] = w['Status'].map(lambda s: 'enviada' if s == 'enviada' else 'draft' if s == 'draft' else
                                     'aband_socio' if 'sociocultural' in str(s) else 'aband_quest')
     w['cert'] = (w['Certificado'] == 'Sim')
@@ -504,8 +516,8 @@ def load_inscricoes_workshops(path):
     return w
 
 
-def inscricoes_ws_block(w, key):
-    sub = w if key == 'ALL' else w[w.terr == key]
+def inscricoes_ws_block(sub, uf):
+    """Bloco de inscrições/certificados de um recorte (uma localidade ou o conjunto). `uf` = estado do recorte ('ALL' = vários)."""
     sub = sub.copy()
     sub['cert_p'] = sub.groupby('cpf')['cert'].transform('any')   # certificado vale para a pessoa
     out = {'rows': {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
@@ -513,10 +525,12 @@ def inscricoes_ws_block(w, key):
     env_people = person_table(sub[sub.status_g == 'enviada'])
     out['pessoas_total'] = int(sub.cpf.nunique())
     out['pessoas_enviadas'] = len(env_people)
-    out['certificados'] = int(sub[sub.cert].cpf.nunique())                 # pessoas certificadas (qualquer status de inscrição)
-    out['certificados_enviadas'] = int(env_people.cert_p.sum())            # ... entre as pessoas com inscrição enviada
-    out['taxa_certificacao'] = pct(out['certificados_enviadas'], out['pessoas_enviadas'])
-    pdm, e = perfil_demografico(env_people, key)
+    # certificado = uma pessoa certificada em uma localidade (quem faz dois workshops tem dois certificados)
+    out['certificados'] = int(sub[sub.cert].drop_duplicates(['cpf', 'Localidade']).shape[0])
+    out['certificados_pessoas'] = int(sub[sub.cert].cpf.nunique())
+    out['certificados_enviadas'] = int(sub[sub.cert & (sub.status_g == 'enviada')].drop_duplicates(['cpf', 'Localidade']).shape[0])
+    out['taxa_certificacao'] = pct(out['certificados'], out['pessoas_enviadas'])      # certificados / inscritos (inscrição enviada)
+    pdm, e = perfil_demografico(env_people, uf)
     out.update(pdm)
     # equidade ao longo do funil: inscritas/os -> certificadas/os (denominador: quem respondeu à pergunta)
     def share(d, col, resp):
@@ -531,33 +545,39 @@ def inscricoes_ws_block(w, key):
 
 
 def inscricoes_workshops(path, wk):
+    """Inscrições e certificados dos workshops, por localidade (e total)."""
     w = load_inscricoes_workshops(path)
-    res = {k: inscricoes_ws_block(w, k) for k in ['ALL', 'SP', 'PE', 'DF', 'BA', 'RN']}
-    # por localidade (+ avaliações recebidas e datas, da aba de avaliação)
-    aval = {l['loc']: l for l in wk['localidades']}
-    horas = {}
-    for x in wk['sessoes']:
-        horas[x['loc']] = horas.get(x['loc'], 0) + (x['horas_mentoria'] or 0)
-    locs = []
+    aval = {l['loc']: l for l in wk['localidades']}                # avaliações e datas (aba de avaliação)
     order = {'SP': 0, 'PE': 1, 'DF': 2, 'BA': 3, 'RN': 4}
-    for l, g in w.groupby('Localidade'):
-        b = inscricoes_ws_block(g, 'ALL')
+    locais = sorted(w.Localidade.dropna().unique(), key=lambda l: (order[l[:2]], l))
+    res = {'ALL': inscricoes_ws_block(w, 'ALL')}
+    locs = []
+    for l in locais:
+        g = w[w.Localidade == l]
+        b = inscricoes_ws_block(g, l[:2])
+        res[l] = b
         locs.append({'loc': l, 'uf': l[:2], 'cidade': l.split('/')[1], 'datas': aval.get(l, {}).get('datas', []),
                      'rows_total': b['rows']['total'], 'enviadas': b['rows']['enviada'], 'pessoas_enviadas': b['pessoas_enviadas'],
-                     'certificados': b['certificados'], 'certificados_enviadas': b['certificados_enviadas'], 'taxa_certificacao': b['taxa_certificacao'],
-                     'avaliacoes': aval.get(l, {}).get('n', 0), 'horas_mentoria': horas.get(l)})
-    locs.sort(key=lambda x: (order[x['uf']], x['cidade']))
+                     'certificados': b['certificados'], 'certificados_enviadas': b['certificados_enviadas'],
+                     'taxa_certificacao': b['taxa_certificacao'], 'avaliacoes': aval.get(l, {}).get('n', 0)})
+    # total = soma das localidades (a mesma pessoa pode ter feito mais de um workshop)
+    a = res['ALL']
+    a['pessoas_enviadas_localidades'] = sum(x['pessoas_enviadas'] for x in locs)
+    a['certificados'] = sum(x['certificados'] for x in locs)
+    a['certificados_enviadas'] = sum(x['certificados_enviadas'] for x in locs)
+    a['taxa_certificacao'] = pct(a['certificados'], a['pessoas_enviadas_localidades'])
+    res['locais'] = locais
     res['por_localidade'] = locs
     raw = pd.read_excel(path, sheet_name='BaseInscricaoWorkshops')
     res['qualidade'] = {
         'linhas': len(raw),
         'linhas_perfil_numerico': int(raw['Gênero'].map(lambda v: bool(re.fullmatch(r'\d+(\.0)?', str(v).strip()))).sum()),
-        'registros_cpf_repetido': int(len(w) - w.cpf.nunique()),
-        'sem_resposta_genero': res['ALL']['demo']['genero'].get('Sem resposta'),
+        'cpf_invalido': int(sum(1 for c in raw['CPF Inscrito'].map(digits) if not (isinstance(c, str) and len(c) == 11))),
+        'certificados_linhas_sim': int((raw['Certificado'] == 'Sim').sum()),
+        'sem_resposta_genero': a['demo']['genero'].get('Sem resposta'),
     }
     res['status_por_localidade'] = [{'loc': x['loc'], **{k: int((w[w.Localidade == x['loc']].status_g == k).sum()) for k in ['enviada', 'draft', 'aband_socio', 'aband_quest']}} for x in locs]
     return res
-
 
 
 def build(args):

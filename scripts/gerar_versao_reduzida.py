@@ -48,6 +48,11 @@ def sub(old, new):
     page = page[:m.start()] + new + page[m.end():]
 
 
+def card_re(titulo):
+    """Um card inteiro: termina no </div> que fecha o card (seguido de outro card ou do fim da linha)."""
+    return re.compile(r'<div class="card[^"]*">\s*<h3>' + re.escape(titulo) + r'</h3>.*?</div>\s*(?=<div class="card|</div>)', re.S)
+
+
 # ---------------- Abas: remove Trilha do Participante e Relatório Institucional ----------------
 sub('<div class="tab" role="tab" data-tab="fx-trilha">Trilha do Participante</div>', '')
 sub('<div class="tab" role="tab" data-tab="fx-relatorio">Relatório Institucional</div>', '')
@@ -59,8 +64,14 @@ sub('Inscrições e participação nas aulas online de SP, PE, DF, BA e RN. Mesm
     'Inscrições e perfil das pessoas inscritas nas aulas online de SP, PE, DF, BA e RN, com os mesmos indicadores '
     'do painel de inscrições.')
 cut('<div class="note-box"> <strong>Leitura com cautela', '<div class="chips" id="fx-chips-aulas">')
+ini_a, fim_a = page.index('id="fx-aulas"'), page.index('id="fx-workshops"')
+m = card_re('Certificados').search(page, ini_a, fim_a)
+card_cert = m.group(0)
 cut('<div class="subhead-row"> <h3>Participação, horas e certificação</h3>',
     '<div class="subhead-row"> <h3>Indicadores de perfil</h3>')
+sub('<div class="subhead-row"> <h3>Indicadores de perfil</h3>',
+    '<div class="subhead-row"><h3>Certificação</h3><span class="tag">Certificados emitidos nas aulas síncronas</span></div>\n'
+    '<div class="cards">' + card_cert + '</div>\n<div class="subhead-row"> <h3>Indicadores de perfil</h3>')
 cut('<div class="subhead-row"> <h3>Retenção: presença em cada aula</h3>',
     '<div class="subhead-row"><h3>Perfil de quem se inscreveu</h3>')
 cut('<div class="subhead-row"> <h3>Conhecimento prévio sobre os temas das aulas</h3>',
@@ -87,11 +98,6 @@ cut('<div class="subhead-row"><h3>Qualidade dos dados desta base</h3></div>',
 sub('Participação, horas e certificação das pessoas convocadas para as mentorias online, e o que a pontuação da '
     'inscrição revela sobre quem se manteve no processo.',
     'Participação e certificação das pessoas convocadas para as mentorias online e perfil de quem chegou às mentorias.')
-def card_re(titulo):
-    """Um card inteiro: termina no </div> que fecha o card (seguido de outro card ou do fim da linha)."""
-    return re.compile(r'<div class="card[^"]*">\s*<h3>' + re.escape(titulo) + r'</h3>.*?</div>\s*(?=<div class="card|</div>)', re.S)
-
-
 for titulo in ('Horas Totais de Mentoria', 'Média por Participante', 'Sem Nenhuma Hora', 'Origem na Base de Inscrições'):
     m = card_re(titulo).search(page)
     if not m:
@@ -119,7 +125,8 @@ D = json.loads(m.group(2))
 T = True
 SPEC = {
     'meta': T,
-    'aulas': {**{k: {'rows': T, 'pessoas_enviadas': T, 'demo': T, 'ind': T, 'linguagens_top': T, 'semanas': T}
+    'aulas': {**{k: {'rows': T, 'pessoas_enviadas': T, 'demo': T, 'ind': T, 'linguagens_top': T, 'semanas': T,
+                     'cert_disponivel': T, 'cert_sim': T, 'cert_pct_inscritos': T, 'cert_territorios': T, 'cert_por_territorio': T}
                  for k in ('ALL', 'SP', 'PE', 'DF', 'BA', 'RN')},
               'pessoas_em_mais_de_um_territorio': T},
     'workshops': {
@@ -129,9 +136,10 @@ SPEC = {
         'item_xiv': T, 'item_xv': T, 'item_xiv_por_uf': T, 'item_xv_por_uf': T,
         'localidades': [{'loc': T, 'uf': T, 'cidade': T, 'n': T, 'itens': T, 'media': T}],
         'inscricoes': {
-            **{k: {'rows': T, 'pessoas_enviadas': T, 'certificados': T, 'certificados_enviadas': T, 'taxa_certificacao': T,
-                   'demo': T, 'ind': T, 'linguagens_top': T, 'semanas': T, 'equidade_funil': T}
-               for k in ('ALL', 'SP', 'PE', 'DF', 'BA', 'RN')},
+            **{k: {'rows': T, 'pessoas_enviadas': T, 'pessoas_enviadas_localidades': T, 'certificados': T, 'certificados_pessoas': T,
+                   'certificados_enviadas': T, 'taxa_certificacao': T, 'demo': T, 'ind': T, 'linguagens_top': T, 'semanas': T,
+                   'equidade_funil': T}
+               for k in ['ALL'] + D['workshops']['inscricoes']['locais']},
             'por_localidade': T, 'status_por_localidade': T},
         'sessoes': [{'loc': T, 'data': T, 'n': T, 'horas_mentoria': T}],
         'pontos_fortes': {'temas': T, 'n_com_conteudo': T, 'sem_tema': T},
