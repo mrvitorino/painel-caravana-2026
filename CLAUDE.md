@@ -103,7 +103,8 @@ Painel das formações executadas, no mesmo design do painel de inscrições. Ex
 A versão reduzida é **derivada** da completa; nunca edite `formacoes.html` à mão.
 
 - **Dados:** `BaseDeDados_Aulas_Workshops_Mentorias.xlsx` (abas BaseSP, BasePE, BaseDF,
-  BaseBA, BaseWorkshops, BaseMentorias) + `data/DB_Inscritos_Caravana2026.xlsx`.
+  BaseBA, BaseRN, BaseWorkshops, BaseMentorias; a BaseRN traz só inscrições, sem presença — RN entra nos
+  indicadores de inscrição e fica de fora de participação/certificação) + `data/DB_Inscritos_Caravana2026.xlsx`.
   As planilhas **não são commitadas** (contêm dados pessoais); o repositório é público,
   então publique somente agregados.
 - **Atualizar a versão publicada** (nesta ordem):

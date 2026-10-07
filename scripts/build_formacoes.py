@@ -13,8 +13,8 @@ import argparse, json, re, unicodedata
 import numpy as np
 import pandas as pd
 
-TERRS = ['SP', 'PE', 'DF', 'BA']
-CAPITAL = {'SP': 'sao paulo', 'PE': 'recife', 'BA': 'salvador', 'DF': 'brasilia'}
+TERRS = ['SP', 'PE', 'DF', 'BA', 'RN']
+CAPITAL = {'SP': 'sao paulo', 'PE': 'recife', 'BA': 'salvador', 'DF': 'brasilia', 'RN': 'natal'}
 CERT_MIN_H = 10  # regra observada nos dados (SP/DF): Sim <=> >= 10h de 12h (>= 75%)
 
 
@@ -148,7 +148,10 @@ def aulas_block(a, planned, key):
     out['pessoas_enviadas'] = len(env_people)
     part = env_people[env_people.n_aulas > 0]
     out['participantes'] = len(part)
-    out['taxa_participacao'] = pct(len(part), len(env_people))
+    # a taxa considera só territórios com presença registrada (a BaseRN traz apenas inscrições)
+    com_presenca = sub[sub.terr.map(lambda t: planned.get(t, 0) > 0)]
+    base_taxa = person_table(com_presenca[com_presenca.status_g == 'enviada'])
+    out['taxa_participacao'] = pct(len(part), len(base_taxa))
     out['horas_aluno'] = float(sub['h'].sum()) if key == 'ALL' else float(sub['h'].sum())
     out['horas_media_participante'] = round(float(part['h'].mean()), 1) if len(part) else None
     # frequência: nº de aulas assistidas entre participantes
@@ -577,6 +580,7 @@ def build(args):
     ap_env['in_db'] = ap_env.cpf.isin(db_cpfs)
     ap_env['part'] = ap_env.n_aulas > 0
     ap_env['cert'] = (ap_env['CERTIFICADO'] == 'Sim')
+    ap_env['tem_pres'] = ap_env.terr.map(lambda t: planned.get(t, 0) > 0)  # RN: base só com inscrições
     aulas_cpf_all = set(ap_env.cpf)
     # mentorias <-> aulas (email / nome)
     a_by_em = {r.em: r.cpf for r in ap_env.itertuples() if r.em and r.em != 'nan'}
@@ -590,9 +594,9 @@ def build(args):
                    'participantes_sp_df': int(ap_env[ap_env.terr.isin(['SP', 'DF'])].part.sum())}
     ov = ap_env[ap_env.in_db]
     tr['aulas_na_base_original'] = {'pessoas': len(ov), 'participantes': int(ov.part.sum()),
-                                    'taxa_participacao': pct(int(ov.part.sum()), len(ov))}
+                                    'taxa_participacao': pct(int(ov.part.sum()), int(ov.tem_pres.sum()))}
     nv = ap_env[~ap_env.in_db]
-    tr['aulas_novos_inscritos'] = {'pessoas': len(nv), 'participantes': int(nv.part.sum()), 'taxa_participacao': pct(int(nv.part.sum()), len(nv))}
+    tr['aulas_novos_inscritos'] = {'pessoas': len(nv), 'participantes': int(nv.part.sum()), 'taxa_participacao': pct(int(nv.part.sum()), int(nv.tem_pres.sum()))}
     tr['mentorias'] = {'pessoas': len(m), 'ativos': int(m.ativo.sum()), 'cert': int(m.cert.sum()), 'na_base_original': int(m.in_db.sum())}
     tr['interseccoes'] = {
         'original_e_aulas': int(len(ov)), 'original_e_mentorias': int(m.in_db.sum()), 'aulas_e_mentorias': int(m.in_aulas.sum()),

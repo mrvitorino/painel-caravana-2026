@@ -54,9 +54,9 @@ sub('<div class="tab" role="tab" data-tab="fx-relatorio">Relatório Instituciona
 cut('<!-- ======================= ABA 4: TRILHA', '</div> <footer>')
 
 # ---------------- Aulas Síncronas ----------------
-sub('Inscrições e participação nas aulas online de SP, PE, DF e BA. Mesmos indicadores do painel de inscrições, '
+sub('Inscrições e participação nas aulas online de SP, PE, DF, BA e RN. Mesmos indicadores do painel de inscrições, '
     'acrescidos de presença, certificação e conhecimento prévio dos participantes.',
-    'Inscrições e perfil das pessoas inscritas nas aulas online de SP, PE, DF e BA, com os mesmos indicadores '
+    'Inscrições e perfil das pessoas inscritas nas aulas online de SP, PE, DF, BA e RN, com os mesmos indicadores '
     'do painel de inscrições.')
 cut('<div class="note-box"> <strong>Leitura com cautela', '<div class="chips" id="fx-chips-aulas">')
 cut('<div class="subhead-row"> <h3>Participação, horas e certificação</h3>',
@@ -119,7 +119,7 @@ T = True
 SPEC = {
     'meta': T,
     'aulas': {**{k: {'rows': T, 'pessoas_enviadas': T, 'demo': T, 'ind': T, 'linguagens_top': T, 'semanas': T}
-                 for k in ('ALL', 'SP', 'PE', 'DF', 'BA')},
+                 for k in ('ALL', 'SP', 'PE', 'DF', 'BA', 'RN')},
               'pessoas_em_mais_de_um_territorio': T},
     'workshops': {
         'respostas': T, 'n_localidades': T, 'n_sessoes': T, 'indice_satisfacao': T, 'media_geral': T,
