@@ -314,6 +314,25 @@ def yn(v):
     return None
 
 
+ROTULOS_WORKSHOP = {
+    'I': ('Fortalece a atuação no território', 'Os conteúdos abordados servirão para fortalecer sua atuação junto ao coletivo/território?'),
+    'II': ('Metodologia das facilitadoras', 'A metodologia utilizada pelas facilitadoras colaborou para o entendimento dos conteúdos e práticas?'),
+    'III': ('Domínio do conteúdo', 'As facilitadoras demonstraram conhecimento do conteúdo abordado?'),
+    'IV': ('Motivação e envolvimento', 'As facilitadoras conseguiram motivar e envolver os participantes?'),
+    'V': ('Expectativas atendidas', 'Em termos gerais, o encontro alcançou suas expectativas em relação aos conteúdos propostos?'),
+    'VI': ('Aplicabilidade na prática', 'O conteúdo abordado se mostrou aplicável na prática?'),
+    'VII': ('Divulgação eficiente', 'A divulgação foi eficiente no território?'),
+    'VIII': ('Divulgação clara', 'A divulgação dos conteúdos e práticas foi clara e condizente com o desenvolvimento?'),
+    'IX': ('Informações de inscrição e seleção', 'As informações sobre inscrição e seleção foram transmitidas de forma clara e eficiente?'),
+    'X': ('Tempo de duração do encontro', 'O tempo de duração do encontro possibilitou o desenvolvimento do tema?'),
+    'XI': ('Espaço e acessibilidade estrutural', 'O espaço de realização foi acolhedor e contou com acessibilidade estrutural?'),
+    'XII': ('Acessibilidade de conteúdo', 'Os encontros, desde a divulgação, contaram com acessibilidade de conteúdo?'),
+    'XIII': ('Recursos e organização', 'O encontro teve recursos (equipamentos, materiais, organização etc.) coerentes com a sua proposta inicial?'),
+    'XIV': ('Objetivos específicos = metas (resposta correta: Sim)', 'Verdadeiro ou falso: os objetivos específicos de um projeto correspondem às suas metas (mensuráveis e quantificáveis). Resposta correta: SIM.'),
+    'XV': ('Divisão fixa do orçamento (resposta correta: Não)', 'Verdadeiro ou falso: todas as leis de incentivo dividem os orçamentos em 50% custos administrativos, 10% captação e 40% produção. Resposta correta: NÃO.'),
+}
+
+
 def workshops_block(path):
     w = pd.read_excel(path, sheet_name='BaseWorkshops')
     cols = list(w.columns)
@@ -367,7 +386,17 @@ def workshops_block(path):
     for (l, d), g in w.groupby(['loc', 'Data']):
         sess.append({'loc': l, 'data': str(d.date()), 'n': len(g), 'facilitador': (g['Facilitador'].dropna().iloc[0] if g['Facilitador'].notna().any() else None)})
     sess.sort(key=lambda x: x['data'])
+    # Horas de mentoria: 6h por localidade, divididas pelos dias de workshop
+    # (1 dia = 6h; 2 dias = 3h por dia; 3 dias = 2h por dia).
+    dias = {}
+    for x in sess:
+        dias[x['loc']] = dias.get(x['loc'], 0) + 1
+    for x in sess:
+        x['horas_mentoria'] = round(6 / dias[x['loc']], 1) if dias[x['loc']] else None
+        if x['horas_mentoria'] is not None and x['horas_mentoria'] == int(x['horas_mentoria']):
+            x['horas_mentoria'] = int(x['horas_mentoria'])
     out['sessoes'] = sess
+    out['rotulos'] = {k: {'curto': v[0], 'completo': v[1]} for k, v in ROTULOS_WORKSHOP.items()}
     out['facilitador_ausente'] = int(w['Facilitador'].isna().sum())
     y14 = w[yn14].map(yn); y15 = w[yn15].map(yn)
     out['item_xiv'] = {'Sim': int((y14 == 'Sim').sum()), 'Não': int((y14 == 'Não').sum()), 'Sem resposta': int(y14.isna().sum())}

@@ -88,24 +88,42 @@ ser alteradas sem nova orientação de identidade visual.
 
 ## Painel de Execução 2026 (segundo painel, mesmo local de publicação)
 
-Painel das formações executadas: aulas síncronas online (SP, PE, DF, BA), workshops
-presenciais, mentorias online, trilha do participante (cruzamento com a base de
-inscrições) e relatório institucional. Mesmo design do painel de inscrições.
+Painel das formações executadas, no mesmo design do painel de inscrições. Existem **duas versões**:
 
-- **GitHub Pages:** `formacoes.html` na raiz (`.../painel-caravana-2026/formacoes.html`),
-  com link cruzado para `index.html` (o `index.html` ainda não aponta para ele).
+- **Reduzida (publicada)** — `formacoes.html` na raiz: comunicação intermediária com o
+  patrocinador, 3 abas (Aulas Síncronas: só inscrições e perfil; Workshops: com mapa de calor rotulado,
+  questões de conteúdo (XIV/XV) e coluna Horas de Mentoria, sem gráfico de notas máximas nem qualidade
+  dos dados; Mentorias: só os números iniciais e o perfil de quem chegou). O JSON embutido é podado: só tem o que a página exibe.
+- **Completa (backup para o futuro)** — `_completo/formacoes-completo.html` (+ versão Elementor
+  na mesma pasta) e a branch Git `backup/painel-execucao-completo-v1`. 5 abas, inclui Trilha do Participante
+  e Relatório Institucional. Será usada quando as bases estiverem completas (PE, BA, RN) e houver
+  o texto das perguntas dos workshops. A pasta começa com `_` para o GitHub Pages não publicá-la
+  (ela continua visível no repositório público).
+
+A versão reduzida é **derivada** da completa; nunca edite `formacoes.html` à mão.
+
 - **Dados:** `BaseDeDados_Aulas_Workshops_Mentorias.xlsx` (abas BaseSP, BasePE, BaseDF,
   BaseBA, BaseWorkshops, BaseMentorias) + `data/DB_Inscritos_Caravana2026.xlsx`.
-  A planilha de formações **não é commitada** (contém dados pessoais); o repositório é
-  público, então publique somente agregados.
-- **Atualizar números:** `python3 scripts/build_formacoes.py --exec <xlsx> --db data/DB_Inscritos_Caravana2026.xlsx --out /tmp/dados.json --html formacoes.html`
-  (só substitui o JSON embutido; o JSON publicado não tem nome, CPF, e-mail nem telefone).
-- **Texto narrativo e relatório:** os números do texto são ligados ao JSON (`data-v`), mas a
-  interpretação (pontos positivos/melhoria, recomendações, notas de leitura) está escrita à mão
+  As planilhas **não são commitadas** (contêm dados pessoais); o repositório é público,
+  então publique somente agregados.
+- **Atualizar a versão publicada** (nesta ordem):
+  1. `python3 scripts/build_formacoes.py --exec <xlsx> --db data/DB_Inscritos_Caravana2026.xlsx --out /tmp/dados.json --html _completo/formacoes-completo.html`
+     (recalcula os números; só substitui o JSON embutido)
+  2. `python3 scripts/gerar_versao_reduzida.py` (gera `formacoes.html`)
+  3. `python3 scripts/gerar_elementor_execucao.py` (gera `wordpress/painel-execucao-2026-elementor.html`)
+  4. Opcional, para o backup: `python3 scripts/gerar_elementor_execucao.py _completo/formacoes-completo.html _completo/painel-execucao-completo-elementor.html`
+- **Texto narrativo:** os números do texto vêm do JSON (`data-v`), mas a interpretação
+  (notas de leitura, citações dos participantes, relatório da versão completa) está escrita à mão
   no HTML — revisar a cada atualização de dados.
+- **Horas de Mentoria dos workshops:** 6h por localidade, divididas pelos dias de workshop
+  (1 dia = 6h; 2 dias = 3h por dia; 3 dias = 2h por dia, caso de Garanhuns).
+- **Rótulos dos itens do formulário de workshops:** vêm do PDF "Rótulos Avaliações Workshops"
+  (constante `ROTULOS_WORKSHOP` em `scripts/build_formacoes.py`). Item XIV: resposta correta Sim;
+  item XV: resposta correta Não (a página mostra % de acertos).
 - **Cruzamentos:** aulas por CPF; mentorias (sem CPF) por e-mail e, na falta, nome normalizado;
   workshops são formulários anônimos (só análise por território).
-- **Elementor:** `python3 scripts/gerar_elementor_execucao.py` gera
-  `wordpress/painel-execucao-2026-elementor.html` (wrapper `#cv2026-execucao`, mesmas 7 regras
-  acima; a logo, a régua e o rodapé são removidos). Colar num novo widget HTML do Elementor,
-  em página própria (sugestão: subitem de "Inteligência Avaliativa", ao lado de "Inscrições & Impacto 2026").
+- **Elementor:** wrapper `#cv2026-execucao`, mesmas 7 regras acima; a logo, a régua e o rodapé são
+  removidos. Colar num widget HTML do Elementor em página própria (sugestão: subitem de
+  "Inteligência Avaliativa", ao lado de "Inscrições & Impacto 2026").
+- **Testes locais:** abrir a página com `?noanim` desliga a animação dos gráficos (usado em
+  testes e na geração de PDF).
