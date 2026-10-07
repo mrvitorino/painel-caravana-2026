@@ -367,6 +367,16 @@ def workshops_block(path):
     for (l, d), g in w.groupby(['loc', 'Data']):
         sess.append({'loc': l, 'data': str(d.date()), 'n': len(g), 'facilitador': (g['Facilitador'].dropna().iloc[0] if g['Facilitador'].notna().any() else None)})
     sess.sort(key=lambda x: x['data'])
+    # Horas de mentoria: 3h por dia, 6h por localidade -> 1 dia = 6h por dia; 2 dias = 3h por dia.
+    # Dias com menos de 2 formulários são tratados como provável erro de data e não contam
+    # (ex.: Garanhuns 05/08, 1 formulário).
+    dias = {}
+    for x in sess:
+        if x['n'] >= 2:
+            dias[x['loc']] = dias.get(x['loc'], 0) + 1
+    for x in sess:
+        nd = dias.get(x['loc'], 0)
+        x['horas_mentoria'] = {1: 6, 2: 3}.get(nd) if x['n'] >= 2 else None
     out['sessoes'] = sess
     out['facilitador_ausente'] = int(w['Facilitador'].isna().sum())
     y14 = w[yn14].map(yn); y15 = w[yn15].map(yn)

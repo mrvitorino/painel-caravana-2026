@@ -412,8 +412,8 @@
             <div class="tab active" role="tab" data-tab="fx-aulas">Aulas Síncronas</div>
             <div class="tab" role="tab" data-tab="fx-workshops">Workshops</div>
             <div class="tab" role="tab" data-tab="fx-mentorias">Mentorias</div>
-            
-            
+            <div class="tab" role="tab" data-tab="fx-trilha">Trilha do Participante</div>
+            <div class="tab" role="tab" data-tab="fx-relatorio">Relatório Institucional</div>
         </div>
 
         <!-- ======================= ABA 1: AULAS SÍNCRONAS ======================= -->
@@ -421,7 +421,15 @@
             <div class="section-head">
                 <p class="eyebrow">Eixo 4 · Aulas síncronas online</p>
                 <h2>Panorama das Aulas Síncronas</h2>
-                <p class="lead">Inscrições e perfil das pessoas inscritas nas aulas online de SP, PE, DF e BA, com os mesmos indicadores do painel de inscrições.</p>
+                <p class="lead">Inscrições e participação nas aulas online de SP, PE, DF e BA. Mesmos indicadores do painel de inscrições, acrescidos de presença, certificação e conhecimento prévio dos participantes.</p>
+            </div>
+
+            <div class="note-box">
+                <strong>Leitura com cautela — dados parciais.</strong> A base recebida tem presença registrada em <strong><span data-v="aulas.SP.aulas_com_registro"></span> de <span data-v="aulas.SP.aulas_previstas_na_base"></span></strong> aulas em SP,
+                <strong><span data-v="aulas.DF.aulas_com_registro"></span> de <span data-v="aulas.DF.aulas_previstas_na_base"></span></strong> em DF,
+                <strong><span data-v="aulas.PE.aulas_com_registro"></span> de <span data-v="aulas.PE.aulas_previstas_na_base"></span></strong> em PE e
+                <strong><span data-v="aulas.BA.aulas_com_registro"></span> de <span data-v="aulas.BA.aulas_previstas_na_base"></span></strong> em BA. Por isso, taxas de participação e certificados só são comparáveis entre SP e DF.
+                O RN não consta nesta base. Cada território soma 12h de carga prevista; o certificado exige presença mínima de 75% (nos dados de SP e DF, certificado = 10h ou mais).
             </div>
 
             <div class="chips" id="fx-chips-aulas">
@@ -453,6 +461,37 @@
                     <h3>Inscrições Não Enviadas</h3>
                     <div class="value" style="color: var(--vermelho);" id="k-nenv">–</div>
                     <span class="indicator" id="k-nenv-s">–</span>
+                </div>
+            </div>
+
+            <div class="subhead-row">
+                <h3>Participação, horas e certificação</h3>
+                <span class="tag">Presença registrada na base</span>
+            </div>
+            <div class="cards">
+                <div class="card novo">
+                    <h3>Participantes</h3>
+                    <div class="value" id="k-part">–</div>
+                    <span class="indicator" id="k-part-s">–</span>
+                    <p class="desc">Pessoas com presença em pelo menos 1 aula.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Horas-aluno registradas</h3>
+                    <div class="value" id="k-horas">–</div>
+                    <span class="indicator" id="k-horas-s">–</span>
+                    <p class="desc">Soma das horas de presença de todos os participantes.</p>
+                </div>
+                <div class="card novo">
+                    <h3>Certificados</h3>
+                    <div class="value" id="k-cert">–</div>
+                    <span class="indicator" id="k-cert-s">–</span>
+                    <p class="desc" id="k-cert-d">–</p>
+                </div>
+                <div class="card novo">
+                    <h3>Aulas com presença registrada</h3>
+                    <div class="value" id="k-aulas">–</div>
+                    <span class="indicator" id="k-aulas-s">–</span>
+                    <p class="desc">Em relação às aulas previstas em cada aba da base.</p>
                 </div>
             </div>
 
@@ -513,6 +552,29 @@
                 </div>
             </div>
 
+            <div class="subhead-row">
+                <h3>Retenção: presença em cada aula</h3>
+                <span class="tag">Aulas ainda sem registro aparecem em cinza</span>
+            </div>
+            <div class="grid-4">
+                <div class="chart-container"><h3>São Paulo</h3><p class="chart-note" id="rt-note-SP"></p><div class="chart-wrapper xs"><canvas id="c-rt-SP"></canvas></div></div>
+                <div class="chart-container"><h3>Pernambuco</h3><p class="chart-note" id="rt-note-PE"></p><div class="chart-wrapper xs"><canvas id="c-rt-PE"></canvas></div></div>
+                <div class="chart-container"><h3>Distrito Federal</h3><p class="chart-note" id="rt-note-DF"></p><div class="chart-wrapper xs"><canvas id="c-rt-DF"></canvas></div></div>
+                <div class="chart-container"><h3>Bahia</h3><p class="chart-note" id="rt-note-BA"></p><div class="chart-wrapper xs"><canvas id="c-rt-BA"></canvas></div></div>
+            </div>
+            <div class="grid-2">
+                <div class="chart-container">
+                    <h3>Assiduidade em SP</h3>
+                    <p class="chart-note">Quantas aulas cada participante frequentou (6 aulas de 2h) — % dos participantes</p>
+                    <div class="chart-wrapper short"><canvas id="c-freq-SP"></canvas></div>
+                </div>
+                <div class="chart-container">
+                    <h3>Assiduidade no DF</h3>
+                    <p class="chart-note">Quantas aulas cada participante frequentou (4 aulas de 2h + 1 de 4h) — % dos participantes</p>
+                    <div class="chart-wrapper short"><canvas id="c-freq-DF"></canvas></div>
+                </div>
+            </div>
+
             <div class="subhead-row"><h3>Perfil de quem se inscreveu</h3><span class="tag" id="perfil-tag">Todos os territórios</span></div>
             <div class="charts-grid">
                 <div class="chart-container span-1"><h3>Identidade de Gênero</h3><p class="chart-note">Pessoas únicas com inscrição enviada</p><div class="chart-wrapper"><canvas id="c-gen"></canvas></div></div>
@@ -524,7 +586,48 @@
                 <div class="chart-container span-2"><h3>Linguagens de Interesse</h3><p class="chart-note">10 mais citadas (cada pessoa pode indicar várias)</p><div class="chart-wrapper"><canvas id="c-ling"></canvas></div></div>
             </div>
 
+            <div class="subhead-row">
+                <h3>Conhecimento prévio sobre os temas das aulas</h3>
+                <span class="tag">Autoavaliação na inscrição · Nível 1 a 4</span>
             </div>
+            <div class="charts-grid">
+                <div class="chart-container span-2">
+                    <h3>Distribuição dos níveis por tema</h3>
+                    <p class="chart-note">% das pessoas que responderam · ordenado do tema com maior proporção de níveis 1–2 (pouco ou nenhum conhecimento)</p>
+                    <div class="chart-wrapper tall"><canvas id="c-know"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Acessibilidade</h3>
+                    <p class="chart-note">Necessidades informadas na inscrição</p>
+                    <div class="stat-tile-row" style="grid-template-columns: 1fr 1fr; margin-bottom: 10px;">
+                        <div class="stat-tile"><div class="st-value" id="ac-n">–</div><div class="st-label">Declararam alguma necessidade</div></div>
+                        <div class="stat-tile"><div class="st-value" id="ac-pct">–</div><div class="st-label">das pessoas inscritas</div></div>
+                    </div>
+                    <div id="ac-temas" style="font-size:13.5px; line-height:1.9;"></div>
+                </div>
+            </div>
+
+            <div class="subhead-row">
+                <h3>Equidade ao longo do funil — SP e DF</h3>
+                <span class="tag">Únicos territórios com certificação avaliável</span>
+            </div>
+            <div class="table-wrap">
+                <table class="datatable" id="t-equity">
+                    <thead><tr><th>Etapa</th><th>Mulheres cis, trans e pessoas não binárias</th><th>Pessoas pretas, pardas e indígenas</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="foot-note">Participação de grupos prioritários em cada etapa (denominador: pessoas que responderam à pergunta). Quedas entre etapas indicam desigualdade de permanência, não de acesso.</p>
+
+            <div class="subhead-row"><h3>Comparativo entre territórios</h3></div>
+            <div class="table-wrap">
+                <table class="datatable" id="t-terr">
+                    <thead><tr><th>Indicador</th><th class="num">SP</th><th class="num">PE</th><th class="num">DF</th><th class="num">BA</th><th class="num">Todos</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="foot-note">“—” = não aplicável ou ainda não avaliável. A coluna “Todos” soma as pessoas únicas (7 pessoas se inscreveram em mais de um território); certificados consideram apenas SP e DF.</p>
+        </div>
 
         <!-- ======================= ABA 2: WORKSHOPS ======================= -->
         <div id="fx-workshops" class="tab-content">
@@ -536,7 +639,7 @@
 
             <div class="note-box">
                 <strong>Como ler esta base.</strong> Cada linha é um <strong>formulário de avaliação anônimo</strong> (transcrito de página em PDF), não um registro de presença: o número de respostas é um indicador de alcance mínimo, não de público.
-                A satisfação considera as notas de 0 a 3 atribuídas a 13 itens do formulário.
+                Os itens I a XIII são notas de 0 a 3 e os itens XIV e XV são respostas Sim/Não. A base não traz o texto das perguntas; por isso os itens aparecem pelo número romano do formulário.
             </div>
 
             <div class="cards">
@@ -553,7 +656,7 @@
                 <div class="card novo">
                     <h3>Índice de Satisfação</h3>
                     <div class="value"><span data-v="workshops.indice_satisfacao" data-f="p1"></span></div>
-                    <span class="indicator">Média <span data-v="workshops.media_geral" data-f="d2"></span> de 3 nos 13 itens avaliados</span>
+                    <span class="indicator">Média <span data-v="workshops.media_geral" data-f="d2"></span> de 3 nos itens I a XIII</span>
                 </div>
                 <div class="card novo">
                     <h3>Notas Máximas</h3>
@@ -571,12 +674,38 @@
                 </div>
                 <div class="chart-container span-2">
                     <h3>Sessões realizadas</h3>
-                    <p class="chart-note">Data, localidade, formulários recebidos e horas de mentoria</p>
+                    <p class="chart-note">Data, localidade, facilitação e formulários recebidos</p>
                     <div class="table-wrap" style="box-shadow:none; margin:0; max-height: 300px; overflow-y:auto;">
-                        <table class="datatable" id="t-w-sess" data-modo="mentoria"><thead><tr><th>Data</th><th>Localidade</th><th class="num">Formulários</th><th class="num">Horas de Mentoria</th></tr></thead><tbody></tbody></table>
+                        <table class="datatable" id="t-w-sess"><thead><tr><th>Data</th><th>Localidade</th><th>Facilitação</th><th class="num">Formulários</th></tr></thead><tbody></tbody></table>
                     </div>
                 </div>
             </div>
+
+            <div class="subhead-row">
+                <h3>Qualidade percebida por item</h3>
+                <span class="tag">Notas de 0 a 3</span>
+            </div>
+            <div class="charts-grid">
+                <div class="chart-container span-2">
+                    <h3>% de Notas Máximas (3) em cada item</h3>
+                    <p class="chart-note">Em laranja, os três itens com menor proporção de nota máxima — pontos de atenção para o time pedagógico</p>
+                    <div class="chart-wrapper"><canvas id="c-w-itens"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Itens XIV e XV (Sim/Não)</h3>
+                    <p class="chart-note">% de respostas “Sim” entre quem respondeu</p>
+                    <div class="table-wrap" style="box-shadow:none; margin:0;">
+                        <table class="datatable" id="t-w-yn"><thead><tr><th>Estado</th><th class="num">Item XIV</th><th class="num">Item XV</th></tr></thead><tbody></tbody></table>
+                    </div>
+                    <p class="foot-note" id="w-yn-note"></p>
+                </div>
+            </div>
+
+            <div class="subhead-row"><h3>Mapa de calor: média por item e localidade</h3><span class="tag">Média 0–3</span></div>
+            <div class="table-wrap">
+                <table class="datatable heat" id="t-w-heat"><thead></thead><tbody></tbody></table>
+            </div>
+            <div class="legend-scale"><span>menor média</span><span class="bar"></span><span>maior média</span></div>
 
             <div class="subhead-row"><h3>O que os participantes disseram</h3><span class="tag">Análise de temas nos comentários (um comentário pode citar mais de um tema)</span></div>
             <div class="charts-grid">
@@ -596,20 +725,27 @@
                     <div class="quote-grid" style="grid-template-columns: 1fr; margin-bottom:0;">
                         <div class="quote">“Teve teoria e prática em um equilíbrio bom. Trouxe muito conhecimento sobre a elaboração de projetos, diminuiu meus equívocos.”<small>Comentário geral · pontos fortes</small></div>
                         <div class="quote">“Muito bom a Caravana para unir os fazedores de cultura do território.”<small>Comentário geral · pontos fortes</small></div>
-                        <div class="quote">“O evento é tão maravilho[so] que o tempo passou tão rápido”<small>Participante · avaliação do workshop</small></div>
+                        <div class="quote melhoria">“Tempo muito curto para a abrangência do conteúdo proposto.”<small>Ponto de melhoria</small></div>
                         <div class="quote melhoria">“A avaliação foi feita às pressas, poderia ser um link no Google Drive.”<small>Ponto de melhoria</small></div>
                     </div>
                 </div>
             </div>
 
+            <div class="subhead-row"><h3>Qualidade dos dados desta base</h3></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value" data-v="workshops.facilitador_ausente"></div><div class="st-label">formulários sem facilitador informado (todos de PE)</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="workshops.respostas_escala_invalida"></div><div class="st-label">formulário com notas fora da escala 0–3 (valor 5), desconsideradas</div></div>
+                <div class="stat-tile"><div class="st-value">1</div><div class="st-label">sessão de Garanhuns com 1 única resposta (05/08), possível erro de data</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="workshops.linhas_duplicadas_exatas"></div><div class="st-label">linhas duplicadas exatas encontradas</div></div>
             </div>
+        </div>
 
         <!-- ======================= ABA 3: MENTORIAS ======================= -->
         <div id="fx-mentorias" class="tab-content">
             <div class="section-head">
                 <p class="eyebrow">Eixo 1 · Mentorias online</p>
                 <h2>Análise das Mentorias</h2>
-                <p class="lead">Participação e certificação das pessoas convocadas para as mentorias online e perfil de quem chegou às mentorias.</p>
+                <p class="lead">Participação, horas e certificação das pessoas convocadas para as mentorias online, e o que a pontuação da inscrição revela sobre quem se manteve no processo.</p>
             </div>
 
             <div class="cards">
@@ -637,6 +773,16 @@
 
             <div class="cards">
                 <div class="card novo">
+                    <h3>Horas Totais de Mentoria</h3>
+                    <div class="value"><span data-v="mentorias.horas_total" data-f="d1"></span>h</div>
+                    <span class="indicator">Soma das horas de todas as pessoas</span>
+                </div>
+                <div class="card novo">
+                    <h3>Média por Participante</h3>
+                    <div class="value"><span data-v="mentorias.horas_media_ativos" data-f="d1"></span>h</div>
+                    <span class="indicator">Mediana <span data-v="mentorias.horas_mediana_ativos" data-f="d1"></span>h · máximo <span data-v="mentorias.horas_max" data-f="d1"></span>h</span>
+                </div>
+                <div class="card novo">
                     <h3>Origem na Base de Inscrições</h3>
                     <div class="value"><span data-v="mentorias.localizados_na_base_inscricoes"></span> de <span data-v="mentorias.total"></span></div>
                     <span class="indicator">Localizados por e-mail ou nome · <span data-v="mentorias.nao_localizados"></span> não localizados</span>
@@ -648,6 +794,43 @@
                 </div>
             </div>
 
+            <div class="subhead-row"><h3>Horas e certificação</h3></div>
+            <div class="charts-grid">
+                <div class="chart-container span-1">
+                    <h3>Pessoas por Faixa de Horas</h3>
+                    <p class="chart-note">Com e sem certificado</p>
+                    <div class="chart-wrapper"><canvas id="c-m-horas"></canvas></div>
+                </div>
+                <div class="chart-container span-2">
+                    <h3>Desfecho por Território de Mentoria</h3>
+                    <p class="chart-note">Certificadas · participaram sem certificado · sem nenhuma hora registrada</p>
+                    <div class="chart-wrapper"><canvas id="c-m-terr"></canvas></div>
+                </div>
+            </div>
+
+            <div class="note-box" id="m-regra-nota"></div>
+
+            <div class="subhead-row"><h3>Titulares e suplentes</h3></div>
+            <div class="table-wrap">
+                <table class="datatable" id="t-m-opp">
+                    <thead><tr><th>Condição</th><th class="num">Pessoas</th><th class="num">Participaram</th><th class="num">Sem horas</th><th class="num">Certificadas</th><th class="num">Horas médias (quem participou)</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="foot-note">Os suplentes ocuparam vagas de titulares que não participaram e mantiveram a ocupação das mentorias.</p>
+
+            <div class="subhead-row"><h3>Pontuação da inscrição × engajamento</h3><span class="tag">Cruzamento com a base de inscrições (pessoas localizadas)</span></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value"><span data-v="mentorias.pontuacao.mediana_convocados" data-f="d2"></span></div><div class="st-label">pontuação mediana dos convocados<br>(todos os inscritos enviados em Mentorias: <span data-v="mentorias.pontuacao.mediana_todos_enviados" data-f="d2"></span>)</div></div>
+                <div class="stat-tile"><div class="st-value"><span data-v="mentorias.pontuacao.pct_convocados_acima_mediana_base" data-f="p0"></span></div><div class="st-label">dos convocados estão acima da mediana de pontuação da base</div></div>
+                <div class="stat-tile"><div class="st-value"><span data-v="mentorias.pontuacao.corr_pontuacao_horas" data-f="d2"></span></div><div class="st-label">correlação (Spearman) entre pontuação e horas de mentoria — praticamente nula</div></div>
+                <div class="stat-tile"><div class="st-value"><span data-v="mentorias.pontuacao.mediana_zero_h" data-f="d2"></span> × <span data-v="mentorias.pontuacao.mediana_ativos" data-f="d2"></span></div><div class="st-label">pontuação mediana de quem ficou com 0h × de quem participou</div></div>
+            </div>
+            <div class="note-box info">
+                <strong>O que isso significa.</strong> A pontuação (que combina critérios afirmativos, experiência e território) foi eficaz para <em>escolher</em> quem entra nas mentorias, mas <strong>não prevê quem permanece</strong>:
+                quem ficou sem nenhuma hora tinha a mesma pontuação mediana de quem participou. A retenção depende de outros fatores — disponibilidade, calendário e acompanhamento — que a inscrição não mede.
+            </div>
+
             <div class="subhead-row"><h3>Perfil de quem chegou às mentorias</h3><span class="tag">Comparativo com a base de inscrições</span></div>
             <div class="table-wrap">
                 <table class="datatable" id="t-m-perfil">
@@ -657,11 +840,207 @@
             </div>
             <p class="foot-note">Demografia vem da base de inscrições (pessoas localizadas por e-mail ou nome). As etapas “Convocadas/os” e “Participaram” têm 47 e 37 pessoas, respectivamente: leia as diferenças como tendência.</p>
 
+            <div class="subhead-row"><h3>Qualidade dos dados desta base</h3></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value" data-v="mentorias.nao_localizados"></div><div class="st-label">pessoas não localizadas na base de inscrições (nomes incompletos ou e-mail ausente)</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="mentorias.sem_email"></div><div class="st-label">registros sem e-mail</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="mentorias.estado_diferente_do_territorio"></div><div class="st-label">pessoas cujo estado difere do território de mentoria</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="mentorias.sem_classificacao"></div><div class="st-label">pessoas sem classificação (titular ou suplente)</div></div>
+            </div>
+        </div>
+
+        <!-- ======================= ABA 4: TRILHA ======================= -->
+        <div id="fx-trilha" class="tab-content">
+            <div class="section-head">
+                <p class="eyebrow">Jornada do participante</p>
+                <h2>Trilha: da inscrição às formações</h2>
+                <p class="lead">Cruzamento entre a base de inscrições (490 inscrições, 352 pessoas), as aulas síncronas e as mentorias. Os workshops são analisados apenas por território, pois os formulários de avaliação são anônimos.</p>
             </div>
 
+            <div class="note-box">
+                <strong>Como o cruzamento foi feito.</strong> Aulas síncronas: por CPF. Mentorias: por e-mail e, na falta dele, por nome normalizado (a base não tem CPF).
+                <strong>Workshops</strong>: <u>não é possível cruzar pessoas</u> — os formulários não têm nome, CPF ou e-mail. Recomendação: incluir um identificador (CPF ou código do participante) nas próximas avaliações.
+            </div>
+
+            <div class="cards">
+                <div class="card">
+                    <h3>Base de Inscrições</h3>
+                    <div class="value" data-v="trilha.inscricoes_original.pessoas"></div>
+                    <span class="indicator"><span data-v="trilha.inscricoes_original.enviadas"></span> pessoas com inscrição enviada</span>
+                </div>
+                <div class="card unicas">
+                    <h3>Aulas Síncronas</h3>
+                    <div class="value" style="color:#2f7db5;" data-v="trilha.aulas.pessoas_enviadas"></div>
+                    <span class="indicator"><span data-v="trilha.aulas.participantes"></span> participaram</span>
+                </div>
+                <div class="card validas">
+                    <h3>Mentorias</h3>
+                    <div class="value" style="color: var(--verde);" data-v="trilha.mentorias.pessoas"></div>
+                    <span class="indicator"><span data-v="trilha.mentorias.ativos"></span> participaram · <span data-v="trilha.mentorias.cert"></span> certificadas</span>
+                </div>
+                <div class="card novo">
+                    <h3>Pessoas Ativas em Formações</h3>
+                    <div class="value" data-v="trilha.ativos_formativos.uniao"></div>
+                    <span class="indicator">Aulas ou mentorias (<span data-v="trilha.ativos_formativos.ambos"></span> nas duas)</span>
+                </div>
+            </div>
+
+            <div class="subhead-row"><h3>Quem aparece em mais de uma etapa</h3></div>
+            <div class="charts-grid">
+                <div class="chart-container span-1">
+                    <h3>Interseções entre as bases</h3>
+                    <p class="chart-note">Número de pessoas presentes nas duas (ou três) fontes</p>
+                    <div class="chart-wrapper"><canvas id="c-t-inter"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Da inscrição em Mentorias à certificação</h3>
+                    <p class="chart-note">Candidatas/os enviados → convocadas/os localizadas/os → participaram → certificadas/os</p>
+                    <div class="chart-wrapper"><canvas id="c-t-fm"></canvas></div>
+                </div>
+                <div class="chart-container span-1">
+                    <h3>Aulas síncronas em SP e DF</h3>
+                    <p class="chart-note">Inscritas/os enviadas/os → participaram → certificadas/os (únicos territórios com certificação)</p>
+                    <div class="chart-wrapper"><canvas id="c-t-fa"></canvas></div>
+                </div>
+            </div>
+            <div class="callout">
+                <div class="co-num" id="co-orig-part">–</div>
+                <div class="co-text">das pessoas que já estavam na base de inscrições e se inscreveram nas aulas síncronas participaram de pelo menos uma aula, contra <strong id="co-novos-part">–</strong> entre quem chegou apenas pelas aulas.
+                    A diferença é sugestiva, mas o grupo é pequeno (<span data-v="trilha.aulas_na_base_original.pessoas"></span> pessoas): <strong>as aulas atraíram, em sua imensa maioria, um público novo</strong> (<span id="co-novos-pct">–</span> das pessoas inscritas não estavam na base original).</div>
+            </div>
+
+            <div class="subhead-row"><h3>Quem avança: perfil em cada etapa da jornada</h3><span class="tag">Mesmos critérios do painel de inscrições</span></div>
+            <div class="table-wrap">
+                <table class="datatable" id="t-t-perfil">
+                    <thead><tr><th>Etapa</th><th class="num">Pessoas</th><th>Mulheres cis, trans e não binárias</th><th>Pretas, pardas e indígenas</th><th>Superior completo ou pós</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="foot-note">Cada etapa usa denominador próprio (quem respondeu à pergunta). As mentorias convocaram proporcionalmente mais mulheres e pessoas negras do que a base de candidatos — efeito dos critérios afirmativos da seleção.</p>
+
+            <div class="subhead-row"><h3>Cobertura por território</h3><span class="tag">Pessoas, exceto workshops (formulários)</span></div>
+            <div class="table-wrap">
+                <table class="datatable" id="t-t-terr">
+                    <thead><tr><th>Estado</th><th class="num">Inscrições (pessoas)</th><th class="num">Aulas: inscritas/os</th><th class="num">Aulas: participaram</th><th class="num">Workshops: formulários</th><th class="num">Mentorias: ativas/os / convocadas/os</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <p class="foot-note">O RN não tem aulas síncronas na base recebida, mas concentra 106 avaliações de workshops (2 localidades) e 8 mentorandos ativos.</p>
+
+            <div class="subhead-row"><h3>Equipe local como participante das formações</h3></div>
+            <div class="stat-tile-row">
+                <div class="stat-tile"><div class="st-value"><span data-v="trilha.equipe_local.em_algum"></span> de <span data-v="trilha.equipe_local.total"></span></div><div class="st-label">integrantes da equipe local (produção e pesquisa) também se inscreveram em aulas ou mentorias</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="trilha.equipe_local.em_mentorias_ativas"></div><div class="st-label">participaram das mentorias</div></div>
+                <div class="stat-tile"><div class="st-value" data-v="trilha.equipe_local.em_aulas_participaram"></div><div class="st-label">frequentaram aulas síncronas</div></div>
+            </div>
+            <p class="foot-note">Dados agregados: não exibimos desempenho individual de pessoas.</p>
         </div>
+
+        <!-- ======================= ABA 5: RELATÓRIO INSTITUCIONAL ======================= -->
+        <div id="fx-relatorio" class="tab-content">
+            <div class="hero-report">
+                <p class="eyebrow">Relatório Institucional · Execução 2026</p>
+                <h1>Aulas, Workshops e Mentorias: resultados, aprendizados e próximos passos</h1>
+                <p>Síntese da execução das formações da Caravana Energia da Cultura 2026, com os pontos positivos que merecem ser celebrados e as oportunidades de melhoria para a próxima etapa. Preparado para o time do projeto e para a Neoenergia.</p>
+                <div class="hero-stats">
+                    <div><div class="hs-value" data-v="aulas.ALL.participantes"></div><div class="hs-label">Participantes nas aulas</div></div>
+                    <div><div class="hs-value" data-v="workshops.respostas"></div><div class="hs-label">Avaliações de workshops</div></div>
+                    <div><div class="hs-value" data-v="mentorias.ativos"></div><div class="hs-label">Mentorandos ativos</div></div>
+                    <div><div class="hs-value" data-v="trilha.ativos_formativos.uniao"></div><div class="hs-label">Pessoas ativas em aulas ou mentorias</div></div>
+                </div>
+            </div>
+
+            <article class="report">
+                <h2>1. Resumo executivo</h2>
+                <p>Entre julho e setembro de 2026, a Caravana entregou três frentes de formação. As <strong>aulas síncronas online</strong> receberam <strong><span data-v="aulas.ALL.rows.total"></span> inscrições</strong> de <strong><span data-v="aulas.ALL.pessoas_enviadas"></span> pessoas</strong> em SP, PE, DF e BA, e <strong><span data-v="aulas.ALL.participantes"></span> pessoas</strong> frequentaram ao menos uma aula (<span data-v="aulas.ALL.taxa_participacao" data-f="p1"></span> das inscritas). Em SP e DF, onde as aulas já foram concluídas, <strong><span data-v="trilha.aulas.cert"></span> pessoas</strong> foram certificadas.
+                Os <strong>workshops presenciais</strong> ocorreram em <strong><span data-v="workshops.n_localidades"></span> localidades</strong> dos cinco estados-foco, com <strong><span data-v="workshops.respostas"></span> avaliações</strong> e índice de satisfação de <strong><span data-v="workshops.indice_satisfacao" data-f="p1"></span></strong>.
+                As <strong>mentorias online</strong> convocaram <strong><span data-v="mentorias.total"></span> pessoas</strong>, das quais <strong><span data-v="mentorias.ativos"></span></strong> participaram e <strong><span data-v="mentorias.cert_sim"></span></strong> se certificaram, com <span data-v="mentorias.horas_total" data-f="d1"></span>h de mentoria registradas.</p>
+                <blockquote class="pull">O desenho funcionou onde foi mais testado — acolhimento, conteúdo e equidade são pontos fortes. O principal desafio é transformar a inscrição em presença contínua e a presença em certificação.</blockquote>
+
+                <h2>2. Resultados por frente</h2>
+                <h3>2.1 Aulas síncronas</h3>
+                <ul>
+                    <li><strong>Demanda e alcance:</strong> <span data-v="aulas.ALL.pessoas_enviadas"></span> pessoas únicas com inscrição enviada; <span data-v="aulas.ALL.ind.mesmo_estado" data-f="rp"></span> residem no estado da aula e <span data-v="aulas.ALL.ind.interior" data-f="rp"></span> vivem fora das capitais (exceto DF).</li>
+                    <li><strong>Participação:</strong> SP <span data-v="aulas.SP.participantes"></span> participantes (<span data-v="aulas.SP.taxa_participacao" data-f="p1"></span>), DF <span data-v="aulas.DF.participantes"></span> (<span data-v="aulas.DF.taxa_participacao" data-f="p1"></span>), PE <span data-v="aulas.PE.participantes"></span> e BA <span data-v="aulas.BA.participantes"></span> (ainda parciais).</li>
+                    <li><strong>Certificação:</strong> SP <span data-v="aulas.SP.cert_sim"></span> certificados (<span data-v="aulas.SP.cert_pct_participantes" data-f="p1"></span> dos participantes) e DF <span data-v="aulas.DF.cert_sim"></span> (<span data-v="aulas.DF.cert_pct_participantes" data-f="p1"></span>).</li>
+                    <li><strong>Conhecimento prévio:</strong> <span data-v="aulas.ALL.conhecimento.rouanet.pct_baixo" data-f="p0"></span> das pessoas se declaram nos níveis 1–2 em Fomento Indireto/Lei Rouanet e <span data-v="aulas.ALL.conhecimento.captacao.pct_baixo" data-f="p0"></span> em Captação de Recursos — os conteúdos programados respondem às maiores lacunas.</li>
+                </ul>
+                <h3>2.2 Workshops presenciais</h3>
+                <ul>
+                    <li>Notas máximas em <strong><span data-v="workshops.pct_nota3" data-f="p1"></span></strong> das respostas e <strong><span data-v="workshops.pct_nota_ate2_ou_mais" data-f="p1"></span></strong> com nota 2 ou 3; resultado consistente nos cinco estados (índice entre 92,6% e 95,6%).</li>
+                    <li>Itens VII e X são os mais frágeis (apenas <span data-v="workshops.itens.6.pct3" data-f="p0"></span> e <span data-v="workshops.itens.9.pct3" data-f="p0"></span> de notas máximas), seguidos do item IX.</li>
+                </ul>
+                <h3>2.3 Mentorias</h3>
+                <ul>
+                    <li><strong><span data-v="mentorias.perfil_localizados.mulher" data-f="rp"></span></strong> das pessoas localizadas são mulheres cis, trans ou não binárias e <strong><span data-v="mentorias.perfil_localizados.pp" data-f="rp"></span></strong> são pretas, pardas ou indígenas.</li>
+                    <li>Participação: BA <span data-v="mentorias.por_territorio.BA.pct_ativos" data-f="p0"></span>, PE <span data-v="mentorias.por_territorio.PE.pct_ativos" data-f="p0"></span>, RN <span data-v="mentorias.por_territorio.RN.pct_ativos" data-f="p0"></span>, SP <span data-v="mentorias.por_territorio.SP.pct_ativos" data-f="p0"></span> e DF <span data-v="mentorias.por_territorio.DF.pct_ativos" data-f="p0"></span>.</li>
+                </ul>
+
+                <h2>3. Pontos positivos e pontos de melhoria</h2>
+                <div class="two-col">
+                    <div class="box pos">
+                        <h3>Pontos positivos</h3>
+                        <ol>
+                            <li><strong>Demanda qualificada e diversa.</strong> <span data-v="aulas.ALL.ind.qualificacao" data-f="rp"></span> das pessoas inscritas nas aulas têm superior ou pós; <span data-v="aulas.ALL.ind.equidade_genero" data-f="rp"></span> são mulheres e <span data-v="aulas.ALL.ind.repr_racial" data-f="rp"></span> pessoas pretas, pardas ou indígenas.</li>
+                            <li><strong>Inclusão de povos tradicionais.</strong> <span data-v="aulas.ALL.demo.pessoas_povos_tradicionais"></span> pessoas se identificam com povos e comunidades tradicionais, com destaque para <strong><span data-v="aulas.ALL.demo.povos.Povos de Terreiro"></span> Povos de Terreiro</strong> — categoria que não aparece na base de inscrições anterior.</li>
+                            <li><strong>Interiorização.</strong> <span data-v="aulas.ALL.ind.interior" data-f="rp"></span> das pessoas inscritas fora do DF vivem fora das capitais, reforçando a estratégia de descentralização.</li>
+                            <li><strong>Workshops muito bem avaliados</strong> em todos os estados, com <span data-v="workshops.item_xiv.Sim"></span> de <span id="r-xiv-d">–</span> respondentes (<span id="r-xiv-p">–</span>) marcaram “Sim” no item XIV.</li>
+                            <li><strong>A seleção das mentorias ampliou a presença de grupos prioritários:</strong> de <span data-v="trilha.perfil_etapas.mentorias_candidatos.mulher" data-f="rp"></span> mulheres entre as candidatas para <span data-v="trilha.perfil_etapas.mentorias_convocados.mulher" data-f="rp"></span> entre as convocadas; pessoas pretas, pardas e indígenas de <span data-v="trilha.perfil_etapas.mentorias_candidatos.pp" data-f="rp"></span> para <span data-v="trilha.perfil_etapas.mentorias_convocados.pp" data-f="rp"></span>.</li>
+                            <li><strong>Suplentes engajaram tanto quanto titulares:</strong> <span data-v="mentorias.por_oportunidade.Suplente.pct_ativos" data-f="p0"></span> dos suplentes participaram (titulares: <span data-v="mentorias.por_oportunidade.Titular.pct_ativos" data-f="p0"></span>).</li>
+                            <li><strong>Aderência ao funil:</strong> <span data-v="mentorias.localizados_na_base_inscricoes"></span> das <span data-v="mentorias.total"></span> pessoas convocadas para mentorias vieram da base de inscrições.</li>
+                        </ol>
+                    </div>
+                    <div class="box neg">
+                        <h3>Pontos de melhoria</h3>
+                        <ol>
+                            <li><strong>Da inscrição à presença.</strong> Só <span data-v="aulas.ALL.taxa_participacao" data-f="p1"></span> das pessoas inscritas nas aulas compareceram a alguma aula; em SP, a presença cai de <span data-v="aulas.SP.presenca_por_aula.0"></span> na aula 1 para <span data-v="aulas.SP.presenca_por_aula.3"></span> na aula 4.</li>
+                            <li><strong>Da presença à certificação.</strong> Em SP e DF, <span id="r-cert-pct">–</span> dos participantes alcançaram o mínimo de 75% de presença; apenas <span id="r-cert-env">–</span> das inscrições enviadas viraram certificado.</li>
+                            <li><strong>Equidade racial se reduz ao longo do funil</strong> em SP e DF: de <span data-v="aulas.equidade_funil.inscritos_sp_df.pp.pct" data-f="p1"></span> das inscrições para <span data-v="aulas.equidade_funil.certificados_sp_df.pp.pct" data-f="p1"></span> dos certificados (pessoas pretas, pardas e indígenas).</li>
+                            <li><strong>Mentorias sem horas.</strong> <span data-v="mentorias.zero_h"></span> de <span data-v="mentorias.total"></span> pessoas (<span id="r-m-zero">–</span>) não registram nenhuma hora, incluindo <span data-v="mentorias.por_oportunidade.Titular.zero_h"></span> titulares; DF tem o pior desempenho (<span data-v="mentorias.por_territorio.DF.zero_h"></span> de <span data-v="mentorias.por_territorio.DF.n"></span> sem horas). A pontuação da inscrição não prevê permanência.</li>
+                            <li><strong>Tempo dos workshops.</strong> <span id="r-w-tempo">–</span> dos comentários de melhoria pedem mais tempo ou carga horária; <span data-v="workshops.pontos_fracos.temas.Poucos participantes / divulgação"></span> citam poucos participantes ou divulgação.</li>
+                            <li><strong>Gestão de dados.</strong> Workshops anônimos e em papel (sem identificador), mentorias sem CPF, PE sem facilitador registrado, regra de certificado de mentorias inconsistente, bases de PE e BA incompletas e RN ausente nas aulas.</li>
+                            <li><strong>Abandono no cadastro.</strong> <span id="r-aband">–</span> inscrições abandonadas e <span data-v="aulas.ALL.rows.draft"></span> rascunhos nunca enviados; o abandono ocorre mais na etapa sociocultural.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <h2>4. Recomendações priorizadas</h2>
+                <div class="table-wrap">
+                    <table class="datatable reco">
+                        <thead><tr><th>Prioridade</th><th>Ação recomendada</th><th>Evidência nos dados</th></tr></thead>
+                        <tbody>
+                            <tr><td>Alta</td><td>Instituir confirmação ativa (WhatsApp e e-mail) em D-7 e D-1 e usar a lista de espera (coluna “Remanescentes”, hoje vazia) para ocupar vagas não confirmadas.</td><td>Baixa conversão de inscrição em presença (35%).</td></tr>
+                            <tr><td>Alta</td><td>Oferecer reposição ou gravação das aulas 3 e 4 e lembrete de “quanto falta para o certificado”.</td><td>Queda de presença no meio da trilha em SP e DF.</td></tr>
+                            <tr><td>Alta</td><td>Unificar o registro de presença (Cult_B) com CPF em aulas, workshops e mentorias, e fechar as bases de PE, BA e RN.</td><td>Impossível cruzar workshops; PE/BA parciais; RN ausente.</td></tr>
+                            <tr><td>Média</td><td>Acompanhamento ativo de titulares nas primeiras semanas de mentoria e critério de disponibilidade na seleção.</td><td>29% dos titulares sem horas; pontuação sem poder preditivo.</td></tr>
+                            <tr><td>Média</td><td>Revisar o conteúdo e a dinâmica dos itens mais frágeis (VII, X e IX) e avaliar ampliar a carga horária dos workshops.</td><td>Menores proporções de nota máxima; 61% dos comentários de melhoria citam tempo.</td></tr>
+                            <tr><td>Média</td><td>Plano de permanência para pessoas negras e indígenas (horários, bolsas de conectividade, acolhimento).</td><td>Queda de 46% para 38% entre inscrição e certificação em SP/DF.</td></tr>
+                            <tr><td>Baixa</td><td>Migrar a avaliação de workshops para formulário digital e encurtar a etapa sociocultural da inscrição.</td><td>Avaliações em papel, “feitas às pressas”; abandono concentrado na etapa sociocultural.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h2>5. Qualidade dos dados e limitações</h2>
+                <ul>
+                    <li>As abas de <strong>PE e BA</strong> registram presença em apenas 2 de 3 e 1 de 4 aulas; certificados só são avaliáveis em SP e DF. Se a base não estiver apenas desatualizada, o Eixo 4 ainda não foi concluído nesses dois estados.</li>
+                    <li>Os <strong>workshops</strong> são formulários anônimos: contamos respostas, não presença, e não cruzamos com pessoas.</li>
+                    <li>Nas <strong>mentorias</strong>, <span data-v="mentorias.nao_localizados"></span> pessoas não foram localizadas na base de inscrições; a regra do certificado não é uniforme (há certificado com 9,5h e ausência de certificado com 10h).</li>
+                    <li>Nas <strong>aulas</strong>, <span data-v="aulas.cpfs_duplicados_no_mesmo_territorio"></span> CPFs aparecem em mais de uma inscrição no mesmo território (consolidados por pessoa), o campo “Idade” veio inválido em <span data-v="aulas.idade_campo_invalido"></span> registros (idade recalculada pela data de nascimento) e as colunas “Remanescentes”, “Selecionados” e “Tem certificado” estão sem preenchimento.</li>
+                    <li>Os temas dos comentários foram classificados por palavras-chave (revisadas manualmente em amostras): são indicativos, não substituem a leitura qualitativa.</li>
+                </ul>
+
+                <h2>6. Próximos passos</h2>
+                <ul>
+                    <li>Atualizar este painel quando as bases de PE, BA e RN forem concluídas, reavaliando participação e certificação.</li>
+                    <li>Validar com a equipe pedagógica o enunciado dos itens I a XV dos workshops e substituir os números romanos por rótulos.</li>
+                    <li>Confirmar a regra oficial de certificação das mentorias e regularizar os casos divergentes.</li>
+                </ul>
+            </article>
+        </div>
+
+    </div>
 </div>
-<script id="dados" type="application/json">{"meta":{"fonte":"BaseDeDados_Aulas_Workshops_Mentorias.xlsx","cert_min_h":10},"aulas":{"ALL":{"rows":{"total":649,"enviada":544,"draft":77,"aband_socio":21,"aband_quest":7},"pessoas_enviadas":536,"demo":{"genero":{"Mulher Cis":327,"Homem Cis":176,"Pessoa não binária":13,"Mulher Trans":5,"Homem Trans":3,"Prefiro não responder":12,"Sem resposta":0},"raca":{"Branca":197,"Parda":188,"Preta":119,"Amarela":13,"Indígena":7,"Prefiro não responder":12,"Sem resposta":0},"formacao":{"Pós-graduação":202,"Superior completo":178,"Superior incompleto":108,"Médio completo":42,"Médio incompleto":5,"Outros":1,"Sem resposta":0},"idade":{"Até 19":1,"20 a 24":31,"25 a 29":56,"30 a 34":83,"35 a 39":118,"40 a 44":101,"45 a 49":59,"50 a 54":40,"55 a 59":29,"60 ou mais":18,"Sem dado":0},"idade_mediana":39.1,"pcd":{"Não sou":509,"Deficiência declarada":27,"Sem resposta":0},"pcd_tipos":{"Física":14,"Múltipla":8,"Intelectual":5},"povos":{"Não":394,"Não sei":44,"Sem resposta":0,"Povos de Terreiro":59,"Sertanejos/Catingueiros":16,"Quilombolas":15,"Ribeirinhos":5,"Outros povos e comunidades":16},"pessoas_povos_tradicionais":98},"ind":{"equidade_genero":{"n":345,"d":536},"repr_racial":{"n":314,"d":536},"qualificacao":{"n":380,"d":536},"mesmo_estado":{"n":508,"d":536},"interior":{"n":280,"d":452}},"linguagens_top":[["Música",207],["Arte Educação",193],["Cinema",157],["Artes Visuais",156],["Teatro",118],["Artes Cênicas",107],["Literatura",103],["Documentário",102],["Museografia / acervos",91],["Fotografia",88]],"semanas":[["2026-08-03",9],["2026-08-10",82],["2026-08-17",194],["2026-08-24",168],["2026-08-31",25],["2026-09-07",27],["2026-09-14",21],["2026-09-21",10]]},"SP":{"rows":{"total":193,"enviada":163,"draft":19,"aband_socio":10,"aband_quest":1},"pessoas_enviadas":163,"demo":{"genero":{"Mulher Cis":99,"Homem Cis":55,"Pessoa não binária":3,"Mulher Trans":2,"Homem Trans":2,"Prefiro não responder":2,"Sem resposta":0},"raca":{"Branca":96,"Parda":38,"Preta":21,"Amarela":4,"Indígena":3,"Prefiro não responder":1,"Sem resposta":0},"formacao":{"Pós-graduação":60,"Superior completo":64,"Superior incompleto":23,"Médio completo":16,"Médio incompleto":0,"Outros":0,"Sem resposta":0},"idade":{"Até 19":1,"20 a 24":10,"25 a 29":15,"30 a 34":29,"35 a 39":25,"40 a 44":35,"45 a 49":20,"50 a 54":10,"55 a 59":12,"60 ou mais":6,"Sem dado":0},"idade_mediana":40.2,"pcd":{"Não sou":154,"Deficiência declarada":9,"Sem resposta":0},"pcd_tipos":{"Física":5,"Múltipla":3,"Intelectual":1},"povos":{"Não":131,"Não sei":12,"Sem resposta":0,"Povos de Terreiro":11,"Sertanejos/Catingueiros":3,"Quilombolas":3,"Ribeirinhos":2,"Outros povos e comunidades":2},"pessoas_povos_tradicionais":20},"ind":{"equidade_genero":{"n":104,"d":163},"repr_racial":{"n":62,"d":163},"qualificacao":{"n":124,"d":163},"mesmo_estado":{"n":157,"d":163},"interior":{"n":101,"d":163}},"linguagens_top":[["Música",67],["Arte Educação",57],["Artes Visuais",52],["Artes Cênicas",48],["Teatro",43],["Cinema",41],["Literatura",40],["Documentário",31],["Museografia / acervos",28],["Dança",28]],"semanas":[["2026-08-10",43],["2026-08-17",53],["2026-08-24",41],["2026-08-31",10],["2026-09-07",11],["2026-09-14",5]]},"PE":{"rows":{"total":195,"enviada":159,"draft":28,"aband_socio":5,"aband_quest":3},"pessoas_enviadas":159,"demo":{"genero":{"Mulher Cis":92,"Homem Cis":58,"Pessoa não binária":5,"Mulher Trans":0,"Homem Trans":0,"Prefiro não responder":4,"Sem resposta":0},"raca":{"Branca":48,"Parda":64,"Preta":34,"Amarela":5,"Indígena":2,"Prefiro não responder":6,"Sem resposta":0},"formacao":{"Pós-graduação":57,"Superior completo":43,"Superior incompleto":43,"Médio completo":13,"Médio incompleto":2,"Outros":1,"Sem resposta":0},"idade":{"Até 19":0,"20 a 24":8,"25 a 29":12,"30 a 34":22,"35 a 39":46,"40 a 44":28,"45 a 49":21,"50 a 54":14,"55 a 59":5,"60 ou mais":3,"Sem dado":0},"idade_mediana":39.3,"pcd":{"Não sou":151,"Deficiência declarada":8,"Sem resposta":0},"pcd_tipos":{"Múltipla":3,"Intelectual":3,"Física":2},"povos":{"Não":114,"Não sei":14,"Sem resposta":0,"Povos de Terreiro":16,"Sertanejos/Catingueiros":9,"Quilombolas":4,"Ribeirinhos":1,"Outros povos e comunidades":7},"pessoas_povos_tradicionais":31},"ind":{"equidade_genero":{"n":97,"d":159},"repr_racial":{"n":100,"d":159},"qualificacao":{"n":100,"d":159},"mesmo_estado":{"n":149,"d":159},"interior":{"n":115,"d":159}},"linguagens_top":[["Música",67],["Arte Educação",47],["Cinema",45],["Artes Visuais",36],["Documentário",32],["Teatro",31],["Museografia / acervos",30],["Fotografia",27],["Dança",26],["Artes Cênicas",25]],"semanas":[["2026-08-03",9],["2026-08-10",14],["2026-08-17",67],["2026-08-24",57],["2026-08-31",4],["2026-09-07",3],["2026-09-14",4],["2026-09-21",1]]},"DF":{"rows":{"total":98,"enviada":87,"draft":8,"aband_socio":1,"aband_quest":2},"pessoas_enviadas":87,"demo":{"genero":{"Mulher Cis":52,"Homem Cis":27,"Pessoa não binária":2,"Mulher Trans":2,"Homem Trans":0,"Prefiro não responder":4,"Sem resposta":0},"raca":{"Branca":30,"Parda":32,"Preta":20,"Amarela":1,"Indígena":0,"Prefiro não responder":4,"Sem resposta":0},"formacao":{"Pós-graduação":32,"Superior completo":31,"Superior incompleto":18,"Médio completo":4,"Médio incompleto":2,"Outros":0,"Sem resposta":0},"idade":{"Até 19":0,"20 a 24":4,"25 a 29":16,"30 a 34":13,"35 a 39":24,"40 a 44":12,"45 a 49":7,"50 a 54":4,"55 a 59":6,"60 ou mais":1,"Sem dado":0},"idade_mediana":36.5,"pcd":{"Não sou":81,"Deficiência declarada":6,"Sem resposta":0},"pcd_tipos":{"Física":3,"Múltipla":2,"Intelectual":1},"povos":{"Não":66,"Não sei":12,"Sem resposta":0,"Povos de Terreiro":8,"Sertanejos/Catingueiros":0,"Quilombolas":1,"Ribeirinhos":0,"Outros povos e comunidades":1},"pessoas_povos_tradicionais":9},"ind":{"equidade_genero":{"n":56,"d":87},"repr_racial":{"n":52,"d":87},"qualificacao":{"n":63,"d":87},"mesmo_estado":{"n":79,"d":87},"interior":null},"linguagens_top":[["Música",38],["Arte Educação",35],["Artes Visuais",25],["Teatro",23],["Cinema",21],["Arte Urbana",20],["Dança",15],["Artesanato",14],["Artes Cênicas",13],["Literatura",13]],"semanas":[["2026-08-10",15],["2026-08-17",41],["2026-08-24",18],["2026-08-31",4],["2026-09-07",9]]},"BA":{"rows":{"total":163,"enviada":135,"draft":22,"aband_socio":5,"aband_quest":1},"pessoas_enviadas":134,"demo":{"genero":{"Mulher Cis":89,"Homem Cis":38,"Pessoa não binária":3,"Mulher Trans":1,"Homem Trans":1,"Prefiro não responder":2,"Sem resposta":0},"raca":{"Branca":27,"Parda":55,"Preta":45,"Amarela":3,"Indígena":2,"Prefiro não responder":2,"Sem resposta":0},"formacao":{"Pós-graduação":56,"Superior completo":43,"Superior incompleto":25,"Médio completo":9,"Médio incompleto":1,"Outros":0,"Sem resposta":0},"idade":{"Até 19":0,"20 a 24":9,"25 a 29":14,"30 a 34":21,"35 a 39":26,"40 a 44":26,"45 a 49":11,"50 a 54":12,"55 a 59":7,"60 ou mais":8,"Sem dado":0},"idade_mediana":39.3,"pcd":{"Não sou":130,"Deficiência declarada":4,"Sem resposta":0},"pcd_tipos":{"Física":4},"povos":{"Não":90,"Não sei":6,"Sem resposta":0,"Povos de Terreiro":24,"Sertanejos/Catingueiros":4,"Quilombolas":7,"Ribeirinhos":2,"Outros povos e comunidades":6},"pessoas_povos_tradicionais":38},"ind":{"equidade_genero":{"n":93,"d":134},"repr_racial":{"n":102,"d":134},"qualificacao":{"n":99,"d":134},"mesmo_estado":{"n":127,"d":134},"interior":{"n":67,"d":134}},"linguagens_top":[["Arte Educação",57],["Cinema",53],["Artes Visuais",45],["Música",38],["Literatura",30],["Artesanato",29],["Fotografia",28],["Documentário",28],["Arte Urbana",23],["Museografia / acervos",23]],"semanas":[["2026-08-10",11],["2026-08-17",37],["2026-08-24",53],["2026-08-31",7],["2026-09-07",5],["2026-09-14",12],["2026-09-21",9]]},"pessoas_em_mais_de_um_territorio":7},"workshops":{"respostas":331,"n_localidades":10,"n_sessoes":15,"indice_satisfacao":93.6,"media_geral":2.81,"pct_nota3":80.1,"pct_nota_ate1":2.1,"localidades":[{"loc":"SP/Itanhaém","uf":"SP","cidade":"Itanhaém","n":20},{"loc":"SP/Limeira","uf":"SP","cidade":"Limeira","n":7},{"loc":"PE/Camaragibe","uf":"PE","cidade":"Camaragibe","n":68},{"loc":"PE/Garanhuns","uf":"PE","cidade":"Garanhuns","n":55},{"loc":"DF/Samambaia","uf":"DF","cidade":"Samambaia","n":15},{"loc":"DF/Taguatinga","uf":"DF","cidade":"Taguatinga","n":11},{"loc":"BA/Santo Antonio de Jesus","uf":"BA","cidade":"Santo Antonio de Jesus","n":19},{"loc":"BA/Simões Filho","uf":"BA","cidade":"Simões Filho","n":30},{"loc":"RN/Caicó","uf":"RN","cidade":"Caicó","n":46},{"loc":"RN/São Gonçalo do Amarante","uf":"RN","cidade":"São Gonçalo do Amarante","n":60}],"sessoes":[{"loc":"SP/Itanhaém","data":"2026-07-04","n":20,"horas_mentoria":6},{"loc":"DF/Taguatinga","data":"2026-07-05","n":11,"horas_mentoria":6},{"loc":"DF/Samambaia","data":"2026-07-06","n":15,"horas_mentoria":6},{"loc":"SP/Limeira","data":"2026-07-11","n":7,"horas_mentoria":6},{"loc":"PE/Camaragibe","data":"2026-08-04","n":34,"horas_mentoria":3},{"loc":"PE/Camaragibe","data":"2026-08-05","n":34,"horas_mentoria":3},{"loc":"PE/Garanhuns","data":"2026-08-05","n":1,"horas_mentoria":null},{"loc":"PE/Garanhuns","data":"2026-08-06","n":35,"horas_mentoria":3},{"loc":"PE/Garanhuns","data":"2026-08-07","n":19,"horas_mentoria":3},{"loc":"BA/Simões Filho","data":"2026-08-12","n":12,"horas_mentoria":3},{"loc":"BA/Simões Filho","data":"2026-08-13","n":18,"horas_mentoria":3},{"loc":"BA/Santo Antonio de Jesus","data":"2026-08-15","n":19,"horas_mentoria":6},{"loc":"RN/Caicó","data":"2026-08-22","n":46,"horas_mentoria":6},{"loc":"RN/São Gonçalo do Amarante","data":"2026-08-24","n":29,"horas_mentoria":3},{"loc":"RN/São Gonçalo do Amarante","data":"2026-08-25","n":31,"horas_mentoria":3}],"pontos_fortes":{"temas":{"Conteúdo e aprendizado":146,"Didática e facilitação":62,"Prática e dinâmica":41,"Troca e interação":53,"Esclarecimento e clareza":47,"Diversidade e conexão territorial":27,"Organização e acolhimento":23},"n_com_conteudo":310,"sem_tema":44},"pontos_fracos":{"temas":{"Pouco tempo / carga horária":141,"Poucos participantes / divulgação":36,"Horário e pontualidade":13,"Estrutura e conforto":28,"Metodologia e aprofundamento":8,"Aplicação da avaliação":2,"Acessibilidade":1},"n_textos":273,"sem_ponto_fraco":43,"n_com_conteudo":230}},"mentorias":{"total":62,"titulares":35,"suplentes":25,"sem_classificacao":2,"ativos":47,"taxa_ativacao":75.8,"cert_sim":22,"taxa_cert_total":35.5,"taxa_cert_ativos":46.8,"zero_h":15,"por_oportunidade":{"Titular":{"zero_h":10},"Suplente":{"zero_h":5}},"localizados_na_base_inscricoes":47,"nao_localizados":15,"perfil_localizados":{"multi_modalidade":{"n":18,"d":47}}},"trilha":{"perfil_etapas":{"inscricoes_original":{"n":288,"mulher":{"n":197,"d":288},"pp":{"n":187,"d":288},"superior":{"n":200,"d":288}},"mentorias_candidatos":{"n":133,"mulher":{"n":87,"d":133},"pp":{"n":89,"d":133},"superior":{"n":84,"d":133}},"mentorias_convocados":{"n":47,"mulher":{"n":42,"d":47},"pp":{"n":37,"d":47},"superior":{"n":34,"d":47}},"mentorias_ativos":{"n":37,"mulher":{"n":34,"d":37},"pp":{"n":28,"d":37},"superior":{"n":28,"d":37}}}}}</script>
+<script id="dados" type="application/json">{"meta":{"fonte":"BaseDeDados_Aulas_Workshops_Mentorias.xlsx","cert_min_h":10},"aulas":{"ALL":{"rows":{"total":649,"enviada":544,"draft":77,"aband_socio":21,"aband_quest":7},"pessoas_total":611,"pessoas_enviadas":536,"participantes":187,"taxa_participacao":34.9,"horas_aluno":1098.0,"horas_media_participante":5.9,"demo":{"genero":{"Mulher Cis":327,"Homem Cis":176,"Pessoa não binária":13,"Mulher Trans":5,"Homem Trans":3,"Prefiro não responder":12,"Sem resposta":0},"raca":{"Branca":197,"Parda":188,"Preta":119,"Amarela":13,"Indígena":7,"Prefiro não responder":12,"Sem resposta":0},"formacao":{"Pós-graduação":202,"Superior completo":178,"Superior incompleto":108,"Médio completo":42,"Médio incompleto":5,"Outros":1,"Sem resposta":0},"idade":{"Até 19":1,"20 a 24":31,"25 a 29":56,"30 a 34":83,"35 a 39":118,"40 a 44":101,"45 a 49":59,"50 a 54":40,"55 a 59":29,"60 ou mais":18,"Sem dado":0},"idade_mediana":39.1,"pcd":{"Não sou":509,"Deficiência declarada":27,"Sem resposta":0},"pcd_tipos":{"Física":14,"Múltipla":8,"Intelectual":5},"povos":{"Não":394,"Não sei":44,"Sem resposta":0,"Povos de Terreiro":59,"Sertanejos/Catingueiros":16,"Quilombolas":15,"Ribeirinhos":5,"Outros povos e comunidades":16},"pessoas_povos_tradicionais":98},"ind":{"equidade_genero":{"n":345,"d":536},"repr_racial":{"n":314,"d":536},"qualificacao":{"n":380,"d":536},"mesmo_estado":{"n":508,"d":536},"interior":{"n":280,"d":452}},"conhecimento":{"captacao":{"n":526,"dist":{"1":170,"2":209,"3":91,"4":56},"media":2.06,"pct_baixo":72.1},"gestao":{"n":526,"dist":{"1":147,"2":173,"3":82,"4":124},"media":2.35,"pct_baixo":60.8},"ia":{"n":525,"dist":{"1":116,"2":227,"3":94,"4":88},"media":2.29,"pct_baixo":65.3},"rouanet":{"n":526,"dist":{"1":160,"2":246,"3":90,"4":30},"media":1.98,"pct_baixo":77.2}},"acessibilidade":{"Sem necessidade":503,"Necessidade declarada":12,"Sem resposta":21},"acessibilidade_temas":{"Auditiva":1,"Mobilidade / conforto":3,"Neurodivergência / sensorial":5,"Outras":1,"Visual / leitura":4},"linguagens_top":[["Música",207],["Arte Educação",193],["Cinema",157],["Artes Visuais",156],["Teatro",118],["Artes Cênicas",107],["Literatura",103],["Documentário",102],["Museografia / acervos",91],["Fotografia",88]],"semanas":[["2026-08-03",9],["2026-08-10",82],["2026-08-17",194],["2026-08-24",168],["2026-08-31",25],["2026-09-07",27],["2026-09-14",21],["2026-09-21",10]]},"SP":{"rows":{"total":193,"enviada":163,"draft":19,"aband_socio":10,"aband_quest":1},"pessoas_total":183,"pessoas_enviadas":163,"participantes":68,"taxa_participacao":41.7,"horas_aluno":498.0,"horas_media_participante":7.3,"aulas_previstas_na_base":6,"freq":{"1":12,"2":11,"3":9,"4":5,"5":18,"6":13},"presenca_por_aula":[52,49,43,35,37,33],"horas_por_aula":[2.0,2.0,2.0,2.0,2.0,2.0],"carga_prevista_h":12.0,"aulas_com_registro":6,"cert_disponivel":true,"cert_sim":31,"cert_pct_participantes":45.6,"cert_ge_min":31,"demo":{"genero":{"Mulher Cis":99,"Homem Cis":55,"Pessoa não binária":3,"Mulher Trans":2,"Homem Trans":2,"Prefiro não responder":2,"Sem resposta":0},"raca":{"Branca":96,"Parda":38,"Preta":21,"Amarela":4,"Indígena":3,"Prefiro não responder":1,"Sem resposta":0},"formacao":{"Pós-graduação":60,"Superior completo":64,"Superior incompleto":23,"Médio completo":16,"Médio incompleto":0,"Outros":0,"Sem resposta":0},"idade":{"Até 19":1,"20 a 24":10,"25 a 29":15,"30 a 34":29,"35 a 39":25,"40 a 44":35,"45 a 49":20,"50 a 54":10,"55 a 59":12,"60 ou mais":6,"Sem dado":0},"idade_mediana":40.2,"pcd":{"Não sou":154,"Deficiência declarada":9,"Sem resposta":0},"pcd_tipos":{"Física":5,"Múltipla":3,"Intelectual":1},"povos":{"Não":131,"Não sei":12,"Sem resposta":0,"Povos de Terreiro":11,"Sertanejos/Catingueiros":3,"Quilombolas":3,"Ribeirinhos":2,"Outros povos e comunidades":2},"pessoas_povos_tradicionais":20},"ind":{"equidade_genero":{"n":104,"d":163},"repr_racial":{"n":62,"d":163},"qualificacao":{"n":124,"d":163},"mesmo_estado":{"n":157,"d":163},"interior":{"n":101,"d":163}},"conhecimento":{"captacao":{"n":156,"dist":{"1":41,"2":78,"3":26,"4":11},"media":2.04,"pct_baixo":76.3},"gestao":{"n":156,"dist":{"1":36,"2":57,"3":24,"4":39},"media":2.42,"pct_baixo":59.6},"ia":{"n":155,"dist":{"1":33,"2":73,"3":27,"4":22},"media":2.25,"pct_baixo":68.4},"rouanet":{"n":156,"dist":{"1":45,"2":68,"3":31,"4":12},"media":2.06,"pct_baixo":72.4}},"acessibilidade":{"Sem necessidade":154,"Necessidade declarada":3,"Sem resposta":6},"acessibilidade_temas":{"Visual / leitura":1,"Neurodivergência / sensorial":2},"linguagens_top":[["Música",67],["Arte Educação",57],["Artes Visuais",52],["Artes Cênicas",48],["Teatro",43],["Cinema",41],["Literatura",40],["Documentário",31],["Museografia / acervos",28],["Dança",28]],"semanas":[["2026-08-10",43],["2026-08-17",53],["2026-08-24",41],["2026-08-31",10],["2026-09-07",11],["2026-09-14",5]]},"PE":{"rows":{"total":195,"enviada":159,"draft":28,"aband_socio":5,"aband_quest":3},"pessoas_total":185,"pessoas_enviadas":159,"participantes":40,"taxa_participacao":25.2,"horas_aluno":248.0,"horas_media_participante":6.2,"aulas_previstas_na_base":3,"freq":{"1":18,"2":22,"3":0},"presenca_por_aula":[36,26,0],"horas_por_aula":[4.0,4.0,null],"carga_prevista_h":8.0,"aulas_com_registro":2,"cert_disponivel":false,"cert_sim":null,"demo":{"genero":{"Mulher Cis":92,"Homem Cis":58,"Pessoa não binária":5,"Mulher Trans":0,"Homem Trans":0,"Prefiro não responder":4,"Sem resposta":0},"raca":{"Branca":48,"Parda":64,"Preta":34,"Amarela":5,"Indígena":2,"Prefiro não responder":6,"Sem resposta":0},"formacao":{"Pós-graduação":57,"Superior completo":43,"Superior incompleto":43,"Médio completo":13,"Médio incompleto":2,"Outros":1,"Sem resposta":0},"idade":{"Até 19":0,"20 a 24":8,"25 a 29":12,"30 a 34":22,"35 a 39":46,"40 a 44":28,"45 a 49":21,"50 a 54":14,"55 a 59":5,"60 ou mais":3,"Sem dado":0},"idade_mediana":39.3,"pcd":{"Não sou":151,"Deficiência declarada":8,"Sem resposta":0},"pcd_tipos":{"Múltipla":3,"Intelectual":3,"Física":2},"povos":{"Não":114,"Não sei":14,"Sem resposta":0,"Povos de Terreiro":16,"Sertanejos/Catingueiros":9,"Quilombolas":4,"Ribeirinhos":1,"Outros povos e comunidades":7},"pessoas_povos_tradicionais":31},"ind":{"equidade_genero":{"n":97,"d":159},"repr_racial":{"n":100,"d":159},"qualificacao":{"n":100,"d":159},"mesmo_estado":{"n":149,"d":159},"interior":{"n":115,"d":159}},"conhecimento":{"captacao":{"n":159,"dist":{"1":58,"2":52,"3":26,"4":23},"media":2.09,"pct_baixo":69.2},"gestao":{"n":159,"dist":{"1":59,"2":40,"3":21,"4":39},"media":2.25,"pct_baixo":62.3},"ia":{"n":159,"dist":{"1":33,"2":66,"3":34,"4":26},"media":2.33,"pct_baixo":62.3},"rouanet":{"n":159,"dist":{"1":57,"2":73,"3":24,"4":5},"media":1.86,"pct_baixo":81.8}},"acessibilidade":{"Sem necessidade":147,"Necessidade declarada":2,"Sem resposta":10},"acessibilidade_temas":{"Neurodivergência / sensorial":2,"Visual / leitura":1},"linguagens_top":[["Música",67],["Arte Educação",47],["Cinema",45],["Artes Visuais",36],["Documentário",32],["Teatro",31],["Museografia / acervos",30],["Fotografia",27],["Dança",26],["Artes Cênicas",25]],"semanas":[["2026-08-03",9],["2026-08-10",14],["2026-08-17",67],["2026-08-24",57],["2026-08-31",4],["2026-09-07",3],["2026-09-14",4],["2026-09-21",1]]},"DF":{"rows":{"total":98,"enviada":87,"draft":8,"aband_socio":1,"aband_quest":2},"pessoas_total":95,"pessoas_enviadas":87,"participantes":26,"taxa_participacao":29.9,"horas_aluno":190.0,"horas_media_participante":7.3,"aulas_previstas_na_base":5,"freq":{"1":6,"2":5,"3":1,"4":5,"5":9},"presenca_por_aula":[20,19,19,15,11],"horas_por_aula":[2.0,2.0,2.0,2.0,4.0],"carga_prevista_h":12.0,"aulas_com_registro":5,"cert_disponivel":true,"cert_sim":11,"cert_pct_participantes":42.3,"cert_ge_min":11,"demo":{"genero":{"Mulher Cis":52,"Homem Cis":27,"Pessoa não binária":2,"Mulher Trans":2,"Homem Trans":0,"Prefiro não responder":4,"Sem resposta":0},"raca":{"Branca":30,"Parda":32,"Preta":20,"Amarela":1,"Indígena":0,"Prefiro não responder":4,"Sem resposta":0},"formacao":{"Pós-graduação":32,"Superior completo":31,"Superior incompleto":18,"Médio completo":4,"Médio incompleto":2,"Outros":0,"Sem resposta":0},"idade":{"Até 19":0,"20 a 24":4,"25 a 29":16,"30 a 34":13,"35 a 39":24,"40 a 44":12,"45 a 49":7,"50 a 54":4,"55 a 59":6,"60 ou mais":1,"Sem dado":0},"idade_mediana":36.5,"pcd":{"Não sou":81,"Deficiência declarada":6,"Sem resposta":0},"pcd_tipos":{"Física":3,"Múltipla":2,"Intelectual":1},"povos":{"Não":66,"Não sei":12,"Sem resposta":0,"Povos de Terreiro":8,"Sertanejos/Catingueiros":0,"Quilombolas":1,"Ribeirinhos":0,"Outros povos e comunidades":1},"pessoas_povos_tradicionais":9},"ind":{"equidade_genero":{"n":56,"d":87},"repr_racial":{"n":52,"d":87},"qualificacao":{"n":63,"d":87},"mesmo_estado":{"n":79,"d":87},"interior":null},"conhecimento":{"captacao":{"n":84,"dist":{"1":29,"2":34,"3":12,"4":9},"media":2.01,"pct_baixo":75.0},"gestao":{"n":84,"dist":{"1":23,"2":33,"3":11,"4":17},"media":2.26,"pct_baixo":66.7},"ia":{"n":84,"dist":{"1":24,"2":28,"3":15,"4":17},"media":2.3,"pct_baixo":61.9},"rouanet":{"n":84,"dist":{"1":22,"2":45,"3":13,"4":4},"media":1.99,"pct_baixo":79.8}},"acessibilidade":{"Sem necessidade":80,"Necessidade declarada":3,"Sem resposta":4},"acessibilidade_temas":{"Outras":1,"Visual / leitura":2,"Mobilidade / conforto":1},"linguagens_top":[["Música",38],["Arte Educação",35],["Artes Visuais",25],["Teatro",23],["Cinema",21],["Arte Urbana",20],["Dança",15],["Artesanato",14],["Artes Cênicas",13],["Literatura",13]],"semanas":[["2026-08-10",15],["2026-08-17",41],["2026-08-24",18],["2026-08-31",4],["2026-09-07",9]]},"BA":{"rows":{"total":163,"enviada":135,"draft":22,"aband_socio":5,"aband_quest":1},"pessoas_total":155,"pessoas_enviadas":134,"participantes":54,"taxa_participacao":40.3,"horas_aluno":162.0,"horas_media_participante":3.0,"aulas_previstas_na_base":4,"freq":{"1":54,"2":0,"3":0,"4":0},"presenca_por_aula":[54,0,0,0],"horas_por_aula":[3.0,null,null,null],"carga_prevista_h":3.0,"aulas_com_registro":1,"cert_disponivel":false,"cert_sim":null,"demo":{"genero":{"Mulher Cis":89,"Homem Cis":38,"Pessoa não binária":3,"Mulher Trans":1,"Homem Trans":1,"Prefiro não responder":2,"Sem resposta":0},"raca":{"Branca":27,"Parda":55,"Preta":45,"Amarela":3,"Indígena":2,"Prefiro não responder":2,"Sem resposta":0},"formacao":{"Pós-graduação":56,"Superior completo":43,"Superior incompleto":25,"Médio completo":9,"Médio incompleto":1,"Outros":0,"Sem resposta":0},"idade":{"Até 19":0,"20 a 24":9,"25 a 29":14,"30 a 34":21,"35 a 39":26,"40 a 44":26,"45 a 49":11,"50 a 54":12,"55 a 59":7,"60 ou mais":8,"Sem dado":0},"idade_mediana":39.3,"pcd":{"Não sou":130,"Deficiência declarada":4,"Sem resposta":0},"pcd_tipos":{"Física":4},"povos":{"Não":90,"Não sei":6,"Sem resposta":0,"Povos de Terreiro":24,"Sertanejos/Catingueiros":4,"Quilombolas":7,"Ribeirinhos":2,"Outros povos e comunidades":6},"pessoas_povos_tradicionais":38},"ind":{"equidade_genero":{"n":93,"d":134},"repr_racial":{"n":102,"d":134},"qualificacao":{"n":99,"d":134},"mesmo_estado":{"n":127,"d":134},"interior":{"n":67,"d":134}},"conhecimento":{"captacao":{"n":132,"dist":{"1":44,"2":48,"3":27,"4":13},"media":2.07,"pct_baixo":69.7},"gestao":{"n":132,"dist":{"1":33,"2":43,"3":27,"4":29},"media":2.39,"pct_baixo":57.6},"ia":{"n":132,"dist":{"1":28,"2":60,"3":20,"4":24},"media":2.3,"pct_baixo":66.7},"rouanet":{"n":132,"dist":{"1":38,"2":63,"3":22,"4":9},"media":2.02,"pct_baixo":76.5}},"acessibilidade":{"Sem necessidade":127,"Necessidade declarada":4,"Sem resposta":3},"acessibilidade_temas":{"Auditiva":1,"Mobilidade / conforto":2,"Neurodivergência / sensorial":1},"linguagens_top":[["Arte Educação",57],["Cinema",53],["Artes Visuais",45],["Música",38],["Literatura",30],["Artesanato",29],["Fotografia",28],["Documentário",28],["Arte Urbana",23],["Museografia / acervos",23]],"semanas":[["2026-08-10",11],["2026-08-17",37],["2026-08-24",53],["2026-08-31",7],["2026-09-07",5],["2026-09-14",12],["2026-09-21",9]]},"equidade_funil":{"inscritos_sp_df":{"mulher":{"n":157,"d":247,"pct":63.6},"pp":{"n":114,"d":247,"pct":46.2}},"inscritos":{"mulher":{"n":345,"d":536,"pct":64.4},"pp":{"n":314,"d":536,"pct":58.6}},"participantes":{"mulher":{"n":130,"d":187,"pct":69.5},"pp":{"n":106,"d":187,"pct":56.7}},"participantes_sp_df":{"mulher":{"n":62,"d":93,"pct":66.7},"pp":{"n":37,"d":93,"pct":39.8}},"certificados_sp_df":{"mulher":{"n":31,"d":42,"pct":73.8},"pp":{"n":16,"d":42,"pct":38.1}}},"pessoas_em_mais_de_um_territorio":7,"cpfs_duplicados_no_mesmo_territorio":29,"idade_campo_invalido":67,"registros_PE_BA_horas_total_vazio":358},"workshops":{"respostas":331,"respostas_escala_invalida":1,"n_localidades":10,"n_sessoes":15,"datas":["2026-07-04","2026-08-25"],"n_notas":4303,"media_geral":2.81,"indice_satisfacao":93.6,"pct_nota3":80.1,"pct_nota_ate1":2.1,"pct_nota_ate2_ou_mais":94.2,"itens":[{"item":"I","n":322,"media":2.88,"pct3":88.5,"pct_ate1":0.3},{"item":"II","n":322,"media":2.91,"pct3":91.0,"pct_ate1":0.0},{"item":"III","n":322,"media":2.95,"pct3":96.3,"pct_ate1":0.9},{"item":"IV","n":316,"media":2.91,"pct3":91.1,"pct_ate1":0.3},{"item":"V","n":313,"media":2.81,"pct3":82.1,"pct_ate1":1.0},{"item":"VI","n":318,"media":2.84,"pct3":84.3,"pct_ate1":0.0},{"item":"VII","n":319,"media":2.44,"pct3":54.9,"pct_ate1":9.4},{"item":"VIII","n":322,"media":2.85,"pct3":85.1,"pct_ate1":0.0},{"item":"IX","n":319,"media":2.74,"pct3":77.7,"pct_ate1":3.8},{"item":"X","n":319,"media":2.55,"pct3":63.6,"pct_ate1":7.2},{"item":"XI","n":320,"media":2.87,"pct3":89.4,"pct_ate1":2.2},{"item":"XII","n":317,"media":2.85,"pct3":87.7,"pct_ate1":2.8},{"item":"XIII","n":315,"media":2.89,"pct3":89.8,"pct_ate1":0.6}],"localidades":[{"loc":"SP/Itanhaém","uf":"SP","cidade":"Itanhaém","n":20,"datas":["2026-07-04"],"facilitador":"Vanessa Raton","media":2.87,"indice":95.6,"pct3":89.5,"itens":[2.95,2.9,3.0,3.0,3.0,2.9,2.45,2.9,2.79,2.8,2.95,2.63,3.0]},{"loc":"SP/Limeira","uf":"SP","cidade":"Limeira","n":7,"datas":["2026-07-11"],"facilitador":"Rodrigo","media":2.87,"indice":95.6,"pct3":88.9,"itens":[3.0,2.86,3.0,3.0,3.0,2.86,2.33,3.0,2.86,2.57,3.0,2.71,3.0]},{"loc":"PE/Camaragibe","uf":"PE","cidade":"Camaragibe","n":68,"datas":["2026-08-04","2026-08-05"],"facilitador":null,"media":2.78,"indice":92.8,"pct3":82.9,"itens":[2.88,2.94,2.97,2.94,2.78,2.81,2.28,2.83,2.67,2.34,2.94,2.92,2.9]},{"loc":"PE/Garanhuns","uf":"PE","cidade":"Garanhuns","n":55,"datas":["2026-08-05","2026-08-06","2026-08-07"],"facilitador":null,"media":2.79,"indice":92.9,"pct3":81.2,"itens":[2.87,2.92,2.94,2.9,2.76,2.9,2.39,2.79,2.69,2.37,2.92,2.87,2.9]},{"loc":"DF/Samambaia","uf":"DF","cidade":"Samambaia","n":15,"datas":["2026-07-06"],"facilitador":"Cecy","media":2.77,"indice":92.2,"pct3":79.3,"itens":[2.8,2.87,2.87,2.86,2.93,2.73,2.27,2.73,2.6,2.79,2.93,2.8,2.8]},{"loc":"DF/Taguatinga","uf":"DF","cidade":"Taguatinga","n":11,"datas":["2026-07-05"],"facilitador":"Alexsan","media":2.8,"indice":93.2,"pct3":81.8,"itens":[2.91,2.9,3.0,2.8,2.8,2.91,2.5,2.9,2.6,2.6,2.89,2.6,2.9]},{"loc":"BA/Santo Antonio de Jesus","uf":"BA","cidade":"Santo Antonio de Jesus","n":19,"datas":["2026-08-15"],"facilitador":"Marcele","media":2.85,"indice":95.1,"pct3":86.2,"itens":[2.88,2.94,2.94,3.0,2.78,2.83,2.56,2.89,2.78,2.61,2.94,3.0,2.94]},{"loc":"BA/Simões Filho","uf":"BA","cidade":"Simões Filho","n":30,"datas":["2026-08-12","2026-08-13"],"facilitador":"Marcele","media":2.85,"indice":95.2,"pct3":87.3,"itens":[2.93,2.9,2.93,2.9,2.89,2.93,2.87,2.9,2.9,2.47,2.73,2.9,2.86]},{"loc":"RN/Caicó","uf":"RN","cidade":"Caicó","n":46,"datas":["2026-08-22"],"facilitador":"Tatiane","media":2.77,"indice":92.3,"pct3":78.7,"itens":[2.78,2.85,2.96,2.89,2.73,2.8,2.47,2.82,2.71,2.72,2.65,2.8,2.83]},{"loc":"RN/São Gonçalo do Amarante","uf":"RN","cidade":"São Gonçalo do Amarante","n":60,"datas":["2026-08-24","2026-08-25"],"facilitador":"Tatiane","media":2.82,"indice":94.1,"pct3":84.2,"itens":[2.93,2.93,2.95,2.86,2.8,2.81,2.43,2.9,2.8,2.64,2.9,2.84,2.88]}],"ufs":[{"uf":"SP","n":27,"localidades":2,"indice":95.6,"media":2.87},{"uf":"PE","n":123,"localidades":2,"indice":92.9,"media":2.79},{"uf":"DF","n":26,"localidades":2,"indice":92.6,"media":2.78},{"uf":"BA","n":49,"localidades":2,"indice":95.1,"media":2.85},{"uf":"RN","n":106,"localidades":2,"indice":93.3,"media":2.8}],"sessoes":[{"loc":"SP/Itanhaém","data":"2026-07-04","n":20,"facilitador":"Vanessa Raton","horas_mentoria":6},{"loc":"DF/Taguatinga","data":"2026-07-05","n":11,"facilitador":"Alexsan","horas_mentoria":6},{"loc":"DF/Samambaia","data":"2026-07-06","n":15,"facilitador":"Cecy","horas_mentoria":6},{"loc":"SP/Limeira","data":"2026-07-11","n":7,"facilitador":"Rodrigo","horas_mentoria":6},{"loc":"PE/Camaragibe","data":"2026-08-04","n":34,"facilitador":null,"horas_mentoria":3},{"loc":"PE/Camaragibe","data":"2026-08-05","n":34,"facilitador":null,"horas_mentoria":3},{"loc":"PE/Garanhuns","data":"2026-08-05","n":1,"facilitador":null,"horas_mentoria":null},{"loc":"PE/Garanhuns","data":"2026-08-06","n":35,"facilitador":null,"horas_mentoria":3},{"loc":"PE/Garanhuns","data":"2026-08-07","n":19,"facilitador":null,"horas_mentoria":3},{"loc":"BA/Simões Filho","data":"2026-08-12","n":12,"facilitador":"Marcele","horas_mentoria":3},{"loc":"BA/Simões Filho","data":"2026-08-13","n":18,"facilitador":"Marcele","horas_mentoria":3},{"loc":"BA/Santo Antonio de Jesus","data":"2026-08-15","n":19,"facilitador":"Marcele","horas_mentoria":6},{"loc":"RN/Caicó","data":"2026-08-22","n":46,"facilitador":"Tatiane","horas_mentoria":6},{"loc":"RN/São Gonçalo do Amarante","data":"2026-08-24","n":29,"facilitador":"Tatiane","horas_mentoria":3},{"loc":"RN/São Gonçalo do Amarante","data":"2026-08-25","n":31,"facilitador":"Tatiane","horas_mentoria":3}],"facilitador_ausente":123,"item_xiv":{"Sim":289,"Não":6,"Sem resposta":36},"item_xv":{"Sim":65,"Não":213,"Sem resposta":53},"item_xiv_por_uf":{"SP":100.0,"PE":97.2,"DF":100.0,"BA":93.5,"RN":100.0},"item_xv_por_uf":{"SP":0.0,"PE":20.4,"DF":37.5,"BA":17.1,"RN":31.2},"linhas_duplicadas_exatas":0,"pontos_fortes":{"n_textos":310,"n_com_conteudo":310,"temas":{"Conteúdo e aprendizado":146,"Didática e facilitação":62,"Prática e dinâmica":41,"Troca e interação":53,"Esclarecimento e clareza":47,"Diversidade e conexão territorial":27,"Organização e acolhimento":23},"sem_tema":44},"pontos_fracos":{"n_textos":273,"sem_ponto_fraco":43,"n_com_conteudo":230,"temas":{"Pouco tempo / carga horária":141,"Poucos participantes / divulgação":36,"Horário e pontualidade":13,"Estrutura e conforto":28,"Metodologia e aprofundamento":8,"Aplicação da avaliação":2,"Acessibilidade":1},"sem_tema":18},"comentarios":{"n":289}},"mentorias":{"total":62,"titulares":35,"suplentes":25,"sem_classificacao":2,"ativos":47,"zero_h":15,"cert_sim":22,"horas_total":425.5,"horas_media_ativos":9.1,"horas_mediana_ativos":10.0,"horas_max":19.0,"taxa_ativacao":75.8,"taxa_cert_total":35.5,"taxa_cert_ativos":46.8,"por_oportunidade":{"Titular":{"n":35,"ativos":25,"zero_h":10,"cert":13,"horas_media_ativos":9.6,"pct_ativos":71.4,"pct_cert":37.1},"Suplente":{"n":25,"ativos":20,"zero_h":5,"cert":9,"horas_media_ativos":9.1,"pct_ativos":80.0,"pct_cert":36.0},"Sem classificação":{"n":2,"ativos":2,"zero_h":0,"cert":0,"horas_media_ativos":1.5,"pct_ativos":100.0,"pct_cert":0.0}},"por_territorio":{"SP":{"n":19,"titulares":14,"suplentes":5,"ativos":13,"zero_h":6,"cert":4,"horas":109.0,"horas_media_ativos":8.4,"pct_ativos":68.4,"pct_cert":21.1},"PE":{"n":10,"titulares":6,"suplentes":4,"ativos":9,"zero_h":1,"cert":6,"horas":92.5,"horas_media_ativos":10.3,"pct_ativos":90.0,"pct_cert":60.0},"DF":{"n":14,"titulares":7,"suplentes":7,"ativos":8,"zero_h":6,"cert":4,"horas":67.5,"horas_media_ativos":8.4,"pct_ativos":57.1,"pct_cert":28.6},"BA":{"n":9,"titulares":3,"suplentes":5,"ativos":9,"zero_h":0,"cert":5,"horas":97.5,"horas_media_ativos":10.8,"pct_ativos":100.0,"pct_cert":55.6},"RN":{"n":10,"titulares":5,"suplentes":4,"ativos":8,"zero_h":2,"cert":3,"horas":59.0,"horas_media_ativos":7.4,"pct_ativos":80.0,"pct_cert":30.0}},"faixas_horas":[{"faixa":"0h","n":15,"cert":0,"n_sem_cert":15},{"faixa":"Até 4h","n":15,"cert":0,"n_sem_cert":15},{"faixa":"4,5 a 9h","n":7,"cert":0,"n_sem_cert":7},{"faixa":"9,5 a 14h","n":14,"cert":11,"n_sem_cert":3},{"faixa":"14,5h ou mais","n":11,"cert":11,"n_sem_cert":0}],"cert_regra":{"min_horas_com_cert":9.5,"max_horas_sem_cert":10.0,"sem_cert_com_9_5_ou_mais":3,"cert_com_menos_de_10h":1},"estado_diferente_do_territorio":8,"sem_estado":3,"sem_email":4,"localizados_na_base_inscricoes":47,"nao_localizados":15,"perfil_localizados":{"n":47,"mulher":{"n":42,"d":47},"pp":{"n":37,"d":47},"superior":{"n":34,"d":47},"multi_modalidade":{"n":18,"d":47}},"categorias_localizados":{"Produtores":13,"Mentorias":47,"Facilitadores":12,"Pesquisadores":5},"pontuacao":{"n_com_pontuacao":47,"mediana_convocados":4.5,"mediana_todos_enviados":3.25,"n_todos_enviados":133,"mediana_titulares":5.25,"mediana_suplentes":4.25,"mediana_ativos":4.5,"mediana_zero_h":4.5,"corr_pontuacao_horas":-0.02,"pct_convocados_acima_mediana_base":85.1},"multi_vs_so_mentorias":{"so_mentorias":{"n":29,"ativos":23,"cert":12},"multi":{"n":18,"ativos":14,"cert":7}},"funil_mentorias":{"inscritos_enviados":133,"convocados_localizados":47}},"trilha":{"inscricoes_original":{"pessoas":352,"enviadas":288},"aulas":{"pessoas_enviadas":536,"participantes":187,"cert":42,"participantes_sp_df":93},"aulas_na_base_original":{"pessoas":21,"participantes":10,"taxa_participacao":47.6},"aulas_novos_inscritos":{"pessoas":515,"participantes":177,"taxa_participacao":34.4},"mentorias":{"pessoas":62,"ativos":47,"cert":22,"na_base_original":47},"interseccoes":{"original_e_aulas":21,"original_e_mentorias":47,"aulas_e_mentorias":10,"original_aulas_mentorias":8,"aulas_e_mentorias_participaram":3},"multi_formato":{"aulas_e_mentoria_ativas":3},"equipe_local":{"total":15,"em_aulas_inscritos":4,"em_aulas_participaram":2,"em_mentorias":4,"em_mentorias_ativas":4,"em_algum":6},"mentorias_localizados":{"n":47,"ativos":37,"cert":19},"mentorias_nao_localizados":{"n":15,"ativos":10,"cert":3},"mentorias_funil_base":{"inscritos_enviados":133,"convocados":47},"ativos_formativos":{"aulas":187,"mentorias":47,"ambos":3,"uniao":231},"perfil_etapas":{"inscricoes_original":{"n":288,"mulher":{"n":197,"d":288},"pp":{"n":187,"d":288},"superior":{"n":200,"d":288}},"mentorias_candidatos":{"n":133,"mulher":{"n":87,"d":133},"pp":{"n":89,"d":133},"superior":{"n":84,"d":133}},"mentorias_convocados":{"n":47,"mulher":{"n":42,"d":47},"pp":{"n":37,"d":47},"superior":{"n":34,"d":47}},"mentorias_ativos":{"n":37,"mulher":{"n":34,"d":37},"pp":{"n":28,"d":37},"superior":{"n":28,"d":37}},"aulas_inscritos":{"n":536,"mulher":{"n":345,"d":536},"pp":{"n":314,"d":536},"superior":{"n":380,"d":536}},"aulas_participantes":{"n":187,"mulher":{"n":130,"d":187},"pp":{"n":106,"d":187},"superior":{"n":145,"d":187}}},"territorio":{"SP":{"inscritos_originais":74,"aulas_inscritos":163,"aulas_participantes":68,"workshops_respostas":27,"workshops_localidades":2,"mentorias_ativos":13,"mentorias_total":19},"PE":{"inscritos_originais":53,"aulas_inscritos":159,"aulas_participantes":40,"workshops_respostas":123,"workshops_localidades":2,"mentorias_ativos":9,"mentorias_total":10},"DF":{"inscritos_originais":67,"aulas_inscritos":87,"aulas_participantes":26,"workshops_respostas":26,"workshops_localidades":2,"mentorias_ativos":8,"mentorias_total":14},"BA":{"inscritos_originais":52,"aulas_inscritos":134,"aulas_participantes":54,"workshops_respostas":49,"workshops_localidades":2,"mentorias_ativos":9,"mentorias_total":9},"RN":{"inscritos_originais":39,"aulas_inscritos":0,"aulas_participantes":0,"workshops_respostas":106,"workshops_localidades":2,"mentorias_ativos":8,"mentorias_total":10}}},"qualidade":{"aulas_cpfs_duplicados_mesmo_territorio":29,"aulas_idade_campo_invalido":67,"colunas_sem_preenchimento_aulas":["Remanescentes","Selecionados","Tem certificado"]}}</script>
 <script>
 (function () {
     'use strict';
