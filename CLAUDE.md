@@ -91,9 +91,9 @@ ser alteradas sem nova orientação de identidade visual.
 Painel das formações executadas, no mesmo design do painel de inscrições. Existem **duas versões**:
 
 - **Reduzida (publicada)** — `formacoes.html` na raiz: comunicação intermediária com o
-  patrocinador, 3 abas (Aulas Síncronas: só inscrições e perfil; Workshops: sem notas por item,
-  mapa de calor nem qualidade dos dados, com a coluna Horas de Mentoria; Mentorias: sem horas,
-  titulares/suplentes e pontuação). O JSON embutido é podado: só tem o que a página exibe.
+  patrocinador, 3 abas (Aulas Síncronas: só inscrições e perfil; Workshops: com mapa de calor rotulado,
+  questões de conteúdo (XIV/XV) e coluna Horas de Mentoria, sem gráfico de notas máximas nem qualidade
+  dos dados; Mentorias: só os números iniciais e o perfil de quem chegou). O JSON embutido é podado: só tem o que a página exibe.
 - **Completa (backup para o futuro)** — `_completo/formacoes-completo.html` (+ versão Elementor
   na mesma pasta) e a branch Git `backup/painel-execucao-completo-v1`. 5 abas, inclui Trilha do Participante
   e Relatório Institucional. Será usada quando as bases estiverem completas (PE, BA, RN) e houver
@@ -115,8 +115,11 @@ A versão reduzida é **derivada** da completa; nunca edite `formacoes.html` à 
 - **Texto narrativo:** os números do texto vêm do JSON (`data-v`), mas a interpretação
   (notas de leitura, citações dos participantes, relatório da versão completa) está escrita à mão
   no HTML — revisar a cada atualização de dados.
-- **Horas de Mentoria dos workshops:** 3h por dia e 6h por localidade (1 dia = 6h; 2 dias = 3h por
-  dia). Dias com menos de 2 formulários não contam (provável erro de data; hoje: Garanhuns 05/08).
+- **Horas de Mentoria dos workshops:** 6h por localidade, divididas pelos dias de workshop
+  (1 dia = 6h; 2 dias = 3h por dia; 3 dias = 2h por dia, caso de Garanhuns).
+- **Rótulos dos itens do formulário de workshops:** vêm do PDF "Rótulos Avaliações Workshops"
+  (constante `ROTULOS_WORKSHOP` em `scripts/build_formacoes.py`). Item XIV: resposta correta Sim;
+  item XV: resposta correta Não (a página mostra % de acertos).
 - **Cruzamentos:** aulas por CPF; mentorias (sem CPF) por e-mail e, na falta, nome normalizado;
   workshops são formulários anônimos (só análise por território).
 - **Elementor:** wrapper `#cv2026-execucao`, mesmas 7 regras acima; a logo, a régua e o rodapé são
