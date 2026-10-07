@@ -4,3 +4,5 @@ data/*.xls
 data/*.csv
 *.xlsx
 .DS_Store
+__pycache__/
+*.pyc
