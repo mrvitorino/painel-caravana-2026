@@ -98,8 +98,10 @@ GEN_ORDER = ['Mulher Cis', 'Homem Cis', 'Pessoa não binária', 'Mulher Trans', 
 RACE_ORDER = ['Branca', 'Parda', 'Preta', 'Amarela', 'Indígena', 'Prefiro não responder', 'Sem resposta']
 FORM_MAP = {'Pós-graduação': 'Pós-graduação', 'Ensino Superior (completo)': 'Superior completo',
             'Ensino Superior (incompleto)': 'Superior incompleto', 'Ensino Médio (completo)': 'Médio completo',
-            'Ensino Médio (incompleto)': 'Médio incompleto'}
-FORM_ORDER = ['Pós-graduação', 'Superior completo', 'Superior incompleto', 'Médio completo', 'Médio incompleto', 'Outros', 'Sem resposta']
+            'Ensino Médio (incompleto)': 'Médio incompleto',
+            'Ensino Fundamental II (completo)': 'Fundamental', 'Ensino Fundamental II (incompleto)': 'Fundamental',
+            'Ensino Fundamental I (completo)': 'Fundamental', 'Ensino Fundamental I (incompleto)': 'Fundamental'}
+FORM_ORDER = ['Pós-graduação', 'Superior completo', 'Superior incompleto', 'Médio completo', 'Médio incompleto', 'Fundamental', 'Outros', 'Sem resposta']
 KNOW_TOPICS = {
     'captacao': 'Captação de Recursos', 'gestao': 'Gestão e Prestação de Contas',
     'ia': 'Inteligência Artificial na cultura', 'rouanet': 'Fomento Indireto (Lei Rouanet)'}
@@ -137,44 +139,11 @@ def person_table(a):
     return a.drop_duplicates('cpf', keep='first')
 
 
-def aulas_block(a, planned, key):
-    sub = a if key == 'ALL' else a[a.terr == key]
-    out = {}
-    out['rows'] = {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
-                   'aband_socio': int((sub.status_g == 'aband_socio').sum()), 'aband_quest': int((sub.status_g == 'aband_quest').sum())}
-    pt = person_table(sub)
-    env_people = person_table(sub[sub.status_g == 'enviada'])
-    out['pessoas_total'] = len(pt)
-    out['pessoas_enviadas'] = len(env_people)
-    part = env_people[env_people.n_aulas > 0]
-    out['participantes'] = len(part)
-    # a taxa considera só territórios com presença registrada (a BaseRN traz apenas inscrições)
-    com_presenca = sub[sub.terr.map(lambda t: planned.get(t, 0) > 0)]
-    base_taxa = person_table(com_presenca[com_presenca.status_g == 'enviada'])
-    out['taxa_participacao'] = pct(len(part), len(base_taxa))
-    out['horas_aluno'] = float(sub['h'].sum()) if key == 'ALL' else float(sub['h'].sum())
-    out['horas_media_participante'] = round(float(part['h'].mean()), 1) if len(part) else None
-    # frequência: nº de aulas assistidas entre participantes
-    if key != 'ALL':
-        n_pl = planned[key]
-        out['aulas_previstas_na_base'] = n_pl
-        out['freq'] = {str(i): int((part.n_aulas == i).sum()) for i in range(1, n_pl + 1)}
-        cols = [f'a{i}' for i in range(1, n_pl + 1)]
-        out['presenca_por_aula'] = [int(sub[c].notna().sum()) for c in cols]
-        out['horas_por_aula'] = [float(sub[c].dropna().iloc[0]) if sub[c].notna().any() else None for c in cols]
-        out['carga_prevista_h'] = float(sum(v for v in out['horas_por_aula'] if v) ) if all(v for v in out['horas_por_aula'][:1]) else None
-        out['aulas_com_registro'] = int(sum(1 for c in cols if sub[c].notna().any()))
-        cert_avail = sub['CERTIFICADO'].notna().any() if 'CERTIFICADO' in sub.columns else False
-        out['cert_disponivel'] = bool(cert_avail)
-        if cert_avail:
-            cp = env_people[env_people.n_aulas > 0]
-            cs = person_table(sub[sub['CERTIFICADO'] == 'Sim'])
-            out['cert_sim'] = len(cs)
-            out['cert_pct_participantes'] = pct(len(cs), len(part))
-            out['cert_ge_min'] = int((part.h >= CERT_MIN_H).sum())
-        else:
-            out['cert_sim'] = None
+def perfil_demografico(env_people, key):
+    """Perfil de pessoas únicas com inscrição enviada (gênero, raça, formação, idade, PcD, povos, indicadores...).
+    `env_people` precisa de: terr, Gênero, Cor/Raça, Formação, UF Inscrito, Cidade inscrito, Data de Inscrição etc."""
     # demografia (pessoas únicas com inscrição enviada)
+    out = {}
     e = env_people.copy()
     e['idade_calc'] = e.apply(age_at, axis=1)
     e['faixa'] = e['idade_calc'].map(band)
@@ -196,8 +165,9 @@ def aulas_block(a, planned, key):
     n_trad = 0
     for v in povos:
         if v in ('Não', 'Não sei', 'Sem resposta'): continue
+        parts = [p.strip() for p in v.split(',') if p.strip() not in ('Não', 'Não sei', '')]
+        if not parts: continue
         n_trad += 1
-        parts = [p.strip() for p in v.split(',')]
         for p in parts:
             if p == 'Povos de Terreiro': pc['Povos de Terreiro'] += 1
             elif p in ('Sertanejos', 'Catingueiros'): pc['Sertanejos/Catingueiros'] += 1
@@ -258,6 +228,48 @@ def aulas_block(a, planned, key):
     dts = pd.to_datetime(e['Data de Inscrição'], dayfirst=True, errors='coerce')
     wk = (dts - pd.to_timedelta(dts.dt.weekday, unit='D')).dt.strftime('%Y-%m-%d').value_counts().sort_index()
     out['semanas'] = [[k, int(v)] for k, v in wk.items()]
+    return out, e
+
+
+def aulas_block(a, planned, key):
+    sub = a if key == 'ALL' else a[a.terr == key]
+    out = {}
+    out['rows'] = {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
+                   'aband_socio': int((sub.status_g == 'aband_socio').sum()), 'aband_quest': int((sub.status_g == 'aband_quest').sum())}
+    pt = person_table(sub)
+    env_people = person_table(sub[sub.status_g == 'enviada'])
+    out['pessoas_total'] = len(pt)
+    out['pessoas_enviadas'] = len(env_people)
+    part = env_people[env_people.n_aulas > 0]
+    out['participantes'] = len(part)
+    # a taxa considera só territórios com presença registrada (a BaseRN traz apenas inscrições)
+    com_presenca = sub[sub.terr.map(lambda t: planned.get(t, 0) > 0)]
+    base_taxa = person_table(com_presenca[com_presenca.status_g == 'enviada'])
+    out['taxa_participacao'] = pct(len(part), len(base_taxa))
+    out['horas_aluno'] = float(sub['h'].sum()) if key == 'ALL' else float(sub['h'].sum())
+    out['horas_media_participante'] = round(float(part['h'].mean()), 1) if len(part) else None
+    # frequência: nº de aulas assistidas entre participantes
+    if key != 'ALL':
+        n_pl = planned[key]
+        out['aulas_previstas_na_base'] = n_pl
+        out['freq'] = {str(i): int((part.n_aulas == i).sum()) for i in range(1, n_pl + 1)}
+        cols = [f'a{i}' for i in range(1, n_pl + 1)]
+        out['presenca_por_aula'] = [int(sub[c].notna().sum()) for c in cols]
+        out['horas_por_aula'] = [float(sub[c].dropna().iloc[0]) if sub[c].notna().any() else None for c in cols]
+        out['carga_prevista_h'] = float(sum(v for v in out['horas_por_aula'] if v) ) if all(v for v in out['horas_por_aula'][:1]) else None
+        out['aulas_com_registro'] = int(sum(1 for c in cols if sub[c].notna().any()))
+        cert_avail = sub['CERTIFICADO'].notna().any() if 'CERTIFICADO' in sub.columns else False
+        out['cert_disponivel'] = bool(cert_avail)
+        if cert_avail:
+            cp = env_people[env_people.n_aulas > 0]
+            cs = person_table(sub[sub['CERTIFICADO'] == 'Sim'])
+            out['cert_sim'] = len(cs)
+            out['cert_pct_participantes'] = pct(len(cs), len(part))
+            out['cert_ge_min'] = int((part.h >= CERT_MIN_H).sum())
+        else:
+            out['cert_sim'] = None
+    pdm, e = perfil_demografico(env_people, key)
+    out.update(pdm)
     return out, e
 
 
@@ -336,8 +348,13 @@ ROTULOS_WORKSHOP = {
 }
 
 
+def _aba_avaliacao(path):
+    nomes = pd.ExcelFile(path).sheet_names
+    return 'BaseAvaliacaoWorkshops' if 'BaseAvaliacaoWorkshops' in nomes else 'BaseWorkshops'
+
+
 def workshops_block(path):
-    w = pd.read_excel(path, sheet_name='BaseWorkshops')
+    w = pd.read_excel(path, sheet_name=_aba_avaliacao(path))
     cols = list(w.columns)
     item_cols = cols[5:18]
     yn14, yn15 = cols[18], cols[19]
@@ -346,7 +363,7 @@ def workshops_block(path):
     for r in ROMAN:
         w[r] = pd.to_numeric(w[r], errors='coerce')
         w.loc[~w[r].isin([0, 1, 2, 3]), r] = np.nan
-    all5 = pd.read_excel(path, sheet_name='BaseWorkshops')[cols[5:18]].apply(pd.to_numeric, errors='coerce').eq(5).sum(axis=1) >= 1
+    all5 = pd.read_excel(path, sheet_name=_aba_avaliacao(path))[cols[5:18]].apply(pd.to_numeric, errors='coerce').eq(5).sum(axis=1) >= 1
     pass  # valores fora de 0-3 (ex.: 5) já foram descartados acima
     n_resp = len(w)
     out = {'respostas': n_resp, 'respostas_escala_invalida': int(all5.sum())}
@@ -461,6 +478,88 @@ def mentorias_block(path, db, resumo_ment):
     return m
 
 
+# --------------------------------------------------------------------------------------
+# INSCRIÇÕES E CERTIFICADOS DOS WORKSHOPS (aba BaseInscricaoWorkshops)
+# --------------------------------------------------------------------------------------
+UFS_VALIDAS = {'SP', 'PE', 'DF', 'BA', 'RN', 'GO', 'PB', 'RR', 'MG', 'RJ', 'CE', 'AL', 'SE', 'MA', 'PI', 'ES', 'PR', 'SC', 'RS', 'MT', 'MS',
+               'TO', 'PA', 'AP', 'AM', 'AC', 'RO'}
+CATEGORICAS_WS = ['Gênero', 'Cor/Raça', 'Formação', 'Pessoa com deficiência?', 'Comunidades Tradicionais/Povos',
+                  'Linguagens de Interesse', 'UF Inscrito']
+
+
+def load_inscricoes_workshops(path):
+    w = pd.read_excel(path, sheet_name='BaseInscricaoWorkshops')
+    w.columns = [re.sub(r'\s+', ' ', str(c)).strip() for c in w.columns]
+    # a planilha traz números soltos (30 e 35) em campos de texto de linhas incompletas: tratados como "sem resposta"
+    for c in CATEGORICAS_WS:
+        w[c] = w[c].map(lambda v: np.nan if (pd.isna(v) or re.fullmatch(r'\d+(\.0)?', str(v).strip())) else str(v).strip())
+    w['UF Inscrito'] = w['UF Inscrito'].map(lambda v: v.upper() if isinstance(v, str) and v.upper() in UFS_VALIDAS else np.nan)
+    w['terr'] = w['Localidade'].str[:2]
+    cpf = w['CPF Inscrito'].map(digits)
+    w['cpf'] = [c if isinstance(c, str) and c else 'sem-cpf:' + nz(n) for c, n in zip(cpf, w['Nome'])]
+    w['status_g'] = w['Status'].map(lambda s: 'enviada' if s == 'enviada' else 'draft' if s == 'draft' else
+                                    'aband_socio' if 'sociocultural' in str(s) else 'aband_quest')
+    w['cert'] = (w['Certificado'] == 'Sim')
+    w['h'] = w['cert'].astype(int)           # desempate em person_table: prefere o registro com certificado
+    return w
+
+
+def inscricoes_ws_block(w, key):
+    sub = w if key == 'ALL' else w[w.terr == key]
+    sub = sub.copy()
+    sub['cert_p'] = sub.groupby('cpf')['cert'].transform('any')   # certificado vale para a pessoa
+    out = {'rows': {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
+                    'aband_socio': int((sub.status_g == 'aband_socio').sum()), 'aband_quest': int((sub.status_g == 'aband_quest').sum())}}
+    env_people = person_table(sub[sub.status_g == 'enviada'])
+    out['pessoas_total'] = int(sub.cpf.nunique())
+    out['pessoas_enviadas'] = len(env_people)
+    out['certificados'] = int(sub[sub.cert].cpf.nunique())                 # pessoas certificadas (qualquer status de inscrição)
+    out['certificados_enviadas'] = int(env_people.cert_p.sum())            # ... entre as pessoas com inscrição enviada
+    out['taxa_certificacao'] = pct(out['certificados_enviadas'], out['pessoas_enviadas'])
+    pdm, e = perfil_demografico(env_people, key)
+    out.update(pdm)
+    # equidade ao longo do funil: inscritas/os -> certificadas/os (denominador: quem respondeu à pergunta)
+    def share(d, col, resp):
+        g = d[d[col].notna()]
+        return {'n': int(g[col].isin(resp).sum()), 'd': len(g), 'pct': pct(int(g[col].isin(resp).sum()), len(g))}
+    mulher = ['Mulher Cis', 'Mulher Trans', 'Pessoa não binária']; pp = ['Preta', 'Parda', 'Indígena']
+    cert = env_people[env_people.cert_p]
+    out['equidade_funil'] = {
+        'inscritos': {'mulher': share(env_people, 'Gênero', mulher), 'pp': share(env_people, 'Cor/Raça', pp)},
+        'certificados': {'mulher': share(cert, 'Gênero', mulher), 'pp': share(cert, 'Cor/Raça', pp)}}
+    return out
+
+
+def inscricoes_workshops(path, wk):
+    w = load_inscricoes_workshops(path)
+    res = {k: inscricoes_ws_block(w, k) for k in ['ALL', 'SP', 'PE', 'DF', 'BA', 'RN']}
+    # por localidade (+ avaliações recebidas e datas, da aba de avaliação)
+    aval = {l['loc']: l for l in wk['localidades']}
+    horas = {}
+    for x in wk['sessoes']:
+        horas[x['loc']] = horas.get(x['loc'], 0) + (x['horas_mentoria'] or 0)
+    locs = []
+    order = {'SP': 0, 'PE': 1, 'DF': 2, 'BA': 3, 'RN': 4}
+    for l, g in w.groupby('Localidade'):
+        b = inscricoes_ws_block(g, 'ALL')
+        locs.append({'loc': l, 'uf': l[:2], 'cidade': l.split('/')[1], 'datas': aval.get(l, {}).get('datas', []),
+                     'rows_total': b['rows']['total'], 'enviadas': b['rows']['enviada'], 'pessoas_enviadas': b['pessoas_enviadas'],
+                     'certificados': b['certificados'], 'certificados_enviadas': b['certificados_enviadas'], 'taxa_certificacao': b['taxa_certificacao'],
+                     'avaliacoes': aval.get(l, {}).get('n', 0), 'horas_mentoria': horas.get(l)})
+    locs.sort(key=lambda x: (order[x['uf']], x['cidade']))
+    res['por_localidade'] = locs
+    raw = pd.read_excel(path, sheet_name='BaseInscricaoWorkshops')
+    res['qualidade'] = {
+        'linhas': len(raw),
+        'linhas_perfil_numerico': int(raw['Gênero'].map(lambda v: bool(re.fullmatch(r'\d+(\.0)?', str(v).strip()))).sum()),
+        'registros_cpf_repetido': int(len(w) - w.cpf.nunique()),
+        'sem_resposta_genero': res['ALL']['demo']['genero'].get('Sem resposta'),
+    }
+    res['status_por_localidade'] = [{'loc': x['loc'], **{k: int((w[w.Localidade == x['loc']].status_g == k).sum()) for k in ['enviada', 'draft', 'aband_socio', 'aband_quest']}} for x in locs]
+    return res
+
+
+
 def build(args):
     a, planned = load_aulas(args.exec)
     db = pd.read_excel(args.db, sheet_name='DB_Inscritos')
@@ -490,6 +589,7 @@ def build(args):
     # ---------------- WORKSHOPS ----------------
     wk, wdf = workshops_block(args.exec)
     res['workshops'] = wk
+    res['workshops']['inscricoes'] = inscricoes_workshops(args.exec, wk)
 
     # ---------------- MENTORIAS ----------------
     m = mentorias_block(args.exec, db, resumo)

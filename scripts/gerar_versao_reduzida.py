@@ -105,7 +105,8 @@ row2 = re.search(r'<div class="cards">\s*</div>\s*', page)
 if not row2:
     raise SystemExit('segunda linha de cards não ficou vazia')
 page = page[:row2.start()] + page[row2.end():]
-m = card_re('Certificados').search(page)
+ini = page.index('id="fx-mentorias"')            # há um card "Certificados" também na aba Workshops
+m = card_re('Certificados').search(page, ini)
 page = page[:m.end()] + card + page[m.end():]
 cut('<div class="subhead-row"><h3>Horas e certificação</h3></div>',
     '<div class="subhead-row"><h3>Perfil de quem chegou às mentorias</h3>')
@@ -127,6 +128,11 @@ SPEC = {
         'itens': [{'item': T, 'media': T}],
         'item_xiv': T, 'item_xv': T, 'item_xiv_por_uf': T, 'item_xv_por_uf': T,
         'localidades': [{'loc': T, 'uf': T, 'cidade': T, 'n': T, 'itens': T, 'media': T}],
+        'inscricoes': {
+            **{k: {'rows': T, 'pessoas_enviadas': T, 'certificados': T, 'certificados_enviadas': T, 'taxa_certificacao': T,
+                   'demo': T, 'ind': T, 'linguagens_top': T, 'semanas': T, 'equidade_funil': T}
+               for k in ('ALL', 'SP', 'PE', 'DF', 'BA', 'RN')},
+            'por_localidade': T, 'status_por_localidade': T},
         'sessoes': [{'loc': T, 'data': T, 'n': T, 'horas_mentoria': T}],
         'pontos_fortes': {'temas': T, 'n_com_conteudo': T, 'sem_tema': T},
         'pontos_fracos': {'temas': T, 'n_textos': T, 'sem_ponto_fraco': T, 'n_com_conteudo': T},

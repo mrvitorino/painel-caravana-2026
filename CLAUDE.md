@@ -103,8 +103,9 @@ Painel das formações executadas, no mesmo design do painel de inscrições. Ex
 A versão reduzida é **derivada** da completa; nunca edite `formacoes.html` à mão.
 
 - **Dados:** `BaseDeDados_Aulas_Workshops_Mentorias.xlsx` (abas BaseSP, BasePE, BaseDF,
-  BaseBA, BaseRN, BaseWorkshops, BaseMentorias; a BaseRN traz só inscrições, sem presença — RN entra nos
-  indicadores de inscrição e fica de fora de participação/certificação) + `data/DB_Inscritos_Caravana2026.xlsx`.
+  BaseBA, BaseRN, BaseInscricaoWorkshops, BaseAvaliacaoWorkshops, BaseMentorias; a BaseRN traz só inscrições,
+  sem presença — RN entra nos indicadores de inscrição e fica de fora de participação/certificação).
+  As abas por localidade de workshop (BaseLimeiraSP etc.) repetem a BaseInscricaoWorkshops e não são lidas) + `data/DB_Inscritos_Caravana2026.xlsx`.
   As planilhas **não são commitadas** (contêm dados pessoais); o repositório é público,
   então publique somente agregados.
 - **Atualizar a versão publicada** (nesta ordem):
@@ -117,7 +118,11 @@ A versão reduzida é **derivada** da completa; nunca edite `formacoes.html` à 
   (notas de leitura, citações dos participantes, relatório da versão completa) está escrita à mão
   no HTML — revisar a cada atualização de dados.
 - **Horas de Mentoria dos workshops:** 6h por localidade, divididas pelos dias de workshop
-  (1 dia = 6h; 2 dias = 3h por dia; 3 dias = 2h por dia, caso de Garanhuns).
+  (1 dia = 6h; 2 dias = 3h por dia; 3 dias = 2h por dia).
+- **Workshops, inscrições e certificados:** vêm da aba `BaseInscricaoWorkshops` (por CPF; coluna
+  `Certificado` = Sim define quem foi certificado). Valores numéricos soltos (30, 35) em campos de perfil
+  são tratados como "sem resposta". A coluna `Selecionados/Remanescentes` não é usada (significado a confirmar).
+  As avaliações (notas I–XV, comentários) vêm da aba `BaseAvaliacaoWorkshops` e seguem anônimas.
 - **Rótulos dos itens do formulário de workshops:** vêm do PDF "Rótulos Avaliações Workshops"
   (constante `ROTULOS_WORKSHOP` em `scripts/build_formacoes.py`). Item XIV: resposta correta Sim;
   item XV: resposta correta Não (a página mostra % de acertos).
