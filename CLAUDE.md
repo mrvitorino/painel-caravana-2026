@@ -95,7 +95,7 @@ Painel das formações executadas, no mesmo design do painel de inscrições. Ex
   mapa de calor nem qualidade dos dados, com a coluna Horas de Mentoria; Mentorias: sem horas,
   titulares/suplentes e pontuação). O JSON embutido é podado: só tem o que a página exibe.
 - **Completa (backup para o futuro)** — `_completo/formacoes-completo.html` (+ versão Elementor
-  na mesma pasta) e a tag Git `painel-execucao-completo-v1`. 5 abas, inclui Trilha do Participante
+  na mesma pasta) e a branch Git `backup/painel-execucao-completo-v1`. 5 abas, inclui Trilha do Participante
   e Relatório Institucional. Será usada quando as bases estiverem completas (PE, BA, RN) e houver
   o texto das perguntas dos workshops. A pasta começa com `_` para o GitHub Pages não publicá-la
   (ela continua visível no repositório público).
