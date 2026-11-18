@@ -1,15 +1,9 @@
-# Painel de Execução 2026 — versão completa (backup)
+# Painel de Execução 2026 — página completa (fonte)
 
-Versão completa do painel (5 abas: Aulas Síncronas, Workshops, Mentorias, Trilha do
-Participante e Relatório Institucional), guardada para uso quando as bases estiverem
-completas (PE, BA e RN) e houver o texto das perguntas dos workshops.
+`formacoes-completo.html` é a **fonte** do Painel de Execução (5 abas, base v2 com avaliações e ausências).
+`formacoes.html` (raiz) é uma cópia idêntica, publicada no GitHub Pages. `painel-execucao-completo-elementor.html`
+é a mesma página no formato do Elementor.
 
-- `formacoes-completo.html` — página completa (GitHub Pages / uso local)
-- `painel-execucao-completo-elementor.html` — mesma página no formato do Elementor
-- Também preservada na branch Git `backup/painel-execucao-completo-v1` (commit com a página completa)
-
-A pasta começa com `_` para que o GitHub Pages (Jekyll) **não a publique** no site.
-Ela continua visível no repositório do GitHub, que é público.
-
-A versão publicada hoje (`formacoes.html`) é derivada desta por
-`scripts/gerar_versao_reduzida.py`.
+Esta pasta começa com `_` para que o GitHub Pages (Jekyll) **não a publique**; ela é visível no repositório público.
+A versão reduzida anterior está na branch Git `backup/painel-execucao-completo-v1` (e no histórico).
+Veja o CLAUDE.md para o passo a passo de atualização.
