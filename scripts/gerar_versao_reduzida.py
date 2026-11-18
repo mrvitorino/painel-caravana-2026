@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Gera a versão reduzida (publicada) do Painel de Execução a partir da versão completa.
+"""LEGADO — só funciona com a página v1 (branch backup/painel-execucao-completo-v1); a página atual
+é a completa e não passa mais por este script.
+
+Gera a versão reduzida (publicada) do Painel de Execução a partir da versão completa.
 
 Entrada : _completo/formacoes-completo.html  (5 abas, JSON completo embutido)
 Saída   : formacoes.html                     (3 abas, só o que é exibido)
