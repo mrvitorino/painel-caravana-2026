@@ -13,8 +13,8 @@ import argparse, json, re, unicodedata
 import numpy as np
 import pandas as pd
 
-TERRS = ['SP', 'PE', 'DF', 'BA']
-CAPITAL = {'SP': 'sao paulo', 'PE': 'recife', 'BA': 'salvador', 'DF': 'brasilia'}
+TERRS = ['SP', 'PE', 'DF', 'BA', 'RN']
+CAPITAL = {'SP': 'sao paulo', 'PE': 'recife', 'BA': 'salvador', 'DF': 'brasilia', 'RN': 'natal'}
 CERT_MIN_H = 10  # regra observada nos dados (SP/DF): Sim <=> >= 10h de 12h (>= 75%)
 
 
@@ -66,6 +66,10 @@ def load_aulas(path):
         d['cpf'] = d['CPF Inscrito'].map(digits)
         d['em'] = d['E-mail'].astype(str).str.lower().str.strip()
         d['nm'] = d['Nome'].map(nz)
+        # certificado: a base mistura 'Sim'/'SIM'/'Não'/'NÃO'
+        d['CERTIFICADO'] = d['CERTIFICADO'].map(lambda v: np.nan if pd.isna(v) else ('Sim' if nz(v) == 'sim' else 'Não')) if 'CERTIFICADO' in d.columns else np.nan
+        # idade: usa a coluna "Idade" da base; vazio (NA) = sem data de nascimento, fica de fora dos cálculos
+        d['idade_calc'] = pd.to_numeric(d['Idade'], errors='coerce').where(lambda x: (x >= 14) & (x <= 90))
         frames.append(d)
     a = pd.concat(frames, ignore_index=True)
     a['status_g'] = a['Status'].map(lambda s: 'enviada' if s == 'enviada' else
@@ -98,8 +102,10 @@ GEN_ORDER = ['Mulher Cis', 'Homem Cis', 'Pessoa não binária', 'Mulher Trans', 
 RACE_ORDER = ['Branca', 'Parda', 'Preta', 'Amarela', 'Indígena', 'Prefiro não responder', 'Sem resposta']
 FORM_MAP = {'Pós-graduação': 'Pós-graduação', 'Ensino Superior (completo)': 'Superior completo',
             'Ensino Superior (incompleto)': 'Superior incompleto', 'Ensino Médio (completo)': 'Médio completo',
-            'Ensino Médio (incompleto)': 'Médio incompleto'}
-FORM_ORDER = ['Pós-graduação', 'Superior completo', 'Superior incompleto', 'Médio completo', 'Médio incompleto', 'Outros', 'Sem resposta']
+            'Ensino Médio (incompleto)': 'Médio incompleto',
+            'Ensino Fundamental II (completo)': 'Fundamental', 'Ensino Fundamental II (incompleto)': 'Fundamental',
+            'Ensino Fundamental I (completo)': 'Fundamental', 'Ensino Fundamental I (incompleto)': 'Fundamental'}
+FORM_ORDER = ['Pós-graduação', 'Superior completo', 'Superior incompleto', 'Médio completo', 'Médio incompleto', 'Fundamental', 'Outros', 'Sem resposta']
 KNOW_TOPICS = {
     'captacao': 'Captação de Recursos', 'gestao': 'Gestão e Prestação de Contas',
     'ia': 'Inteligência Artificial na cultura', 'rouanet': 'Fomento Indireto (Lei Rouanet)'}
@@ -137,43 +143,14 @@ def person_table(a):
     return a.drop_duplicates('cpf', keep='first')
 
 
-def aulas_block(a, planned, key):
-    sub = a if key == 'ALL' else a[a.terr == key]
-    out = {}
-    out['rows'] = {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
-                   'aband_socio': int((sub.status_g == 'aband_socio').sum()), 'aband_quest': int((sub.status_g == 'aband_quest').sum())}
-    pt = person_table(sub)
-    env_people = person_table(sub[sub.status_g == 'enviada'])
-    out['pessoas_total'] = len(pt)
-    out['pessoas_enviadas'] = len(env_people)
-    part = env_people[env_people.n_aulas > 0]
-    out['participantes'] = len(part)
-    out['taxa_participacao'] = pct(len(part), len(env_people))
-    out['horas_aluno'] = float(sub['h'].sum()) if key == 'ALL' else float(sub['h'].sum())
-    out['horas_media_participante'] = round(float(part['h'].mean()), 1) if len(part) else None
-    # frequência: nº de aulas assistidas entre participantes
-    if key != 'ALL':
-        n_pl = planned[key]
-        out['aulas_previstas_na_base'] = n_pl
-        out['freq'] = {str(i): int((part.n_aulas == i).sum()) for i in range(1, n_pl + 1)}
-        cols = [f'a{i}' for i in range(1, n_pl + 1)]
-        out['presenca_por_aula'] = [int(sub[c].notna().sum()) for c in cols]
-        out['horas_por_aula'] = [float(sub[c].dropna().iloc[0]) if sub[c].notna().any() else None for c in cols]
-        out['carga_prevista_h'] = float(sum(v for v in out['horas_por_aula'] if v) ) if all(v for v in out['horas_por_aula'][:1]) else None
-        out['aulas_com_registro'] = int(sum(1 for c in cols if sub[c].notna().any()))
-        cert_avail = sub['CERTIFICADO'].notna().any() if 'CERTIFICADO' in sub.columns else False
-        out['cert_disponivel'] = bool(cert_avail)
-        if cert_avail:
-            cp = env_people[env_people.n_aulas > 0]
-            cs = person_table(sub[sub['CERTIFICADO'] == 'Sim'])
-            out['cert_sim'] = len(cs)
-            out['cert_pct_participantes'] = pct(len(cs), len(part))
-            out['cert_ge_min'] = int((part.h >= CERT_MIN_H).sum())
-        else:
-            out['cert_sim'] = None
+def perfil_demografico(env_people, key):
+    """Perfil de pessoas únicas com inscrição enviada (gênero, raça, formação, idade, PcD, povos, indicadores...).
+    `env_people` precisa de: terr, Gênero, Cor/Raça, Formação, UF Inscrito, Cidade inscrito, Data de Inscrição etc."""
     # demografia (pessoas únicas com inscrição enviada)
+    out = {}
     e = env_people.copy()
-    e['idade_calc'] = e.apply(age_at, axis=1)
+    if 'idade_calc' not in e.columns:
+        e['idade_calc'] = e.apply(age_at, axis=1)        # workshops: calculada pela data de nascimento
     e['faixa'] = e['idade_calc'].map(band)
     e['gen'] = e['Gênero'].fillna('Sem resposta')
     e['raca'] = e['Cor/Raça'].fillna('Sem resposta')
@@ -193,8 +170,9 @@ def aulas_block(a, planned, key):
     n_trad = 0
     for v in povos:
         if v in ('Não', 'Não sei', 'Sem resposta'): continue
+        parts = [p.strip() for p in v.split(',') if p.strip() not in ('Não', 'Não sei', '')]
+        if not parts: continue
         n_trad += 1
-        parts = [p.strip() for p in v.split(',')]
         for p in parts:
             if p == 'Povos de Terreiro': pc['Povos de Terreiro'] += 1
             elif p in ('Sertanejos', 'Catingueiros'): pc['Sertanejos/Catingueiros'] += 1
@@ -253,31 +231,81 @@ def aulas_block(a, planned, key):
     out['linguagens_top'] = [[names[k], v] for k, v in top]
     # inscrições por semana (pessoas únicas, 1ª inscrição enviada)
     dts = pd.to_datetime(e['Data de Inscrição'], dayfirst=True, errors='coerce')
-    wk = (dts - pd.to_timedelta(dts.dt.weekday, unit='D')).dt.strftime('%Y-%m-%d').value_counts().sort_index()
+    wk = (dts - pd.to_timedelta(dts.dt.day_of_week, unit='D')).dt.strftime('%Y-%m-%d').value_counts().sort_index()
     out['semanas'] = [[k, int(v)] for k, v in wk.items()]
     return out, e
 
 
+def aulas_block(a, planned, key):
+    sub = a if key == 'ALL' else a[a.terr == key]
+    out = {}
+    out['rows'] = {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
+                   'aband_socio': int((sub.status_g == 'aband_socio').sum()), 'aband_quest': int((sub.status_g == 'aband_quest').sum())}
+    pt = person_table(sub)
+    env_people = person_table(sub[sub.status_g == 'enviada'])
+    out['pessoas_total'] = len(pt)
+    out['pessoas_enviadas'] = len(env_people)
+    part = env_people[env_people.n_aulas > 0]
+    out['participantes'] = len(part)
+    out['taxa_participacao'] = pct(len(part), len(env_people))
+    out['nunca_compareceram'] = int(len(env_people) - len(part))
+    out['horas_aluno'] = float(sub['h'].sum()) if key == 'ALL' else float(sub['h'].sum())
+    out['horas_media_participante'] = round(float(part['h'].mean()), 1) if len(part) else None
+    # frequência: nº de aulas assistidas entre participantes
+    cs_all = person_table(sub[sub['CERTIFICADO'] == 'Sim'])
+    out['cert_sim'] = len(cs_all)
+    out['cert_pct_participantes'] = pct(len(cs_all), len(part))
+    out['cert_pct_inscritos'] = pct(len(cs_all), len(env_people))
+    out['desistentes'] = int(len(part) - len(part[part.cpf.isin(cs_all.cpf)]))   # participaram e não se certificaram
+    out['cert_disponivel'] = True
+    if key != 'ALL':
+        n_pl = planned[key]
+        out['aulas_previstas_na_base'] = n_pl
+        out['freq'] = {str(i): int((part.n_aulas == i).sum()) for i in range(1, n_pl + 1)}
+        cols = [f'a{i}' for i in range(1, n_pl + 1)]
+        out['presenca_por_aula'] = [int(sub[c].notna().sum()) for c in cols]
+        out['horas_por_aula'] = [float(sub[c].dropna().iloc[0]) if sub[c].notna().any() else None for c in cols]
+        out['carga_prevista_h'] = float(sum(v for v in out['horas_por_aula'] if v))
+        out['aulas_com_registro'] = int(sum(1 for c in cols if sub[c].notna().any()))
+        out['retencao_ultima_aula'] = pct(out['presenca_por_aula'][-1], out['presenca_por_aula'][0])
+        # regra observada do certificado: menor carga com certificado e se alguém acima dela ficou sem
+        mn = float(cs_all.h.min()) if len(cs_all) else None
+        out['cert_regra'] = {'min_horas_com_cert': mn, 'carga_prevista_h': out['carga_prevista_h'],
+                             'pct_da_carga': pct(mn, out['carga_prevista_h']) if mn else None,
+                             'sem_cert_acima_do_minimo': int(((sub['CERTIFICADO'] != 'Sim') & (sub.h >= mn)).sum()) if mn else None}
+        out['cert_ge_min'] = int((part.h >= mn).sum()) if mn else None
+        # distribuição de horas entre quem participou
+        out['horas_dist'] = {str(float(k)).rstrip('0').rstrip('.'): int(v) for k, v in part.h.value_counts().sort_index().items()}
+    else:
+        com_cert = sorted(t for t in sub.terr.unique() if sub[sub.terr == t]['CERTIFICADO'].notna().any())
+        out['cert_territorios'] = com_cert
+        out['cert_por_territorio'] = {t: int(person_table(sub[(sub.terr == t) & (sub['CERTIFICADO'] == 'Sim')]).shape[0]) for t in com_cert}
+    pdm, e = perfil_demografico(env_people, key)
+    out.update(pdm)
+    return out, e
+
+
 def equity_funnel(a):
-    """Participação de grupos prioritários em cada etapa (pessoas únicas)."""
+    """Participação de grupos prioritários em cada etapa (pessoas únicas, todos os territórios)."""
     env = person_table(a[a.status_g == 'enviada']).copy()
     env['mulher'] = env['Gênero'].isin(['Mulher Cis', 'Mulher Trans', 'Pessoa não binária'])
     env['pp'] = env['Cor/Raça'].isin(['Preta', 'Parda', 'Indígena'])
     env['rg'] = env['Gênero'].notna(); env['rr'] = env['Cor/Raça'].notna()
     part = env[env.n_aulas > 0]
-    cert = env[(env.terr.isin(['SP', 'DF'])) & (env['CERTIFICADO'] == 'Sim')]
-    base_cert = part[part.terr.isin(['SP', 'DF'])]
+    cert = env[env['CERTIFICADO'] == 'Sim']
     def share(d, col, resp):
         dd = d[d[resp]]
         return {'n': int(dd[col].sum()), 'd': len(dd), 'pct': pct(int(dd[col].sum()), len(dd))}
-    env_spdf = env[env.terr.isin(['SP', 'DF'])]
-    return {
-        'inscritos_sp_df': {'mulher': share(env_spdf, 'mulher', 'rg'), 'pp': share(env_spdf, 'pp', 'rr')},
-        'inscritos': {'mulher': share(env, 'mulher', 'rg'), 'pp': share(env, 'pp', 'rr')},
-        'participantes': {'mulher': share(part, 'mulher', 'rg'), 'pp': share(part, 'pp', 'rr')},
-        'participantes_sp_df': {'mulher': share(base_cert, 'mulher', 'rg'), 'pp': share(base_cert, 'pp', 'rr')},
-        'certificados_sp_df': {'mulher': share(cert, 'mulher', 'rg'), 'pp': share(cert, 'pp', 'rr')},
-    }
+    out = {}
+    for k, d in (('inscritos', env), ('participantes', part), ('certificados', cert)):
+        out[k] = {'mulher': share(d, 'mulher', 'rg'), 'pp': share(d, 'pp', 'rr')}
+    # por território (inscritos -> participantes -> certificados)
+    out['por_territorio'] = {}
+    for t in TERRS:
+        e_t = env[env.terr == t]; p_t = part[part.terr == t]; c_t = cert[cert.terr == t]
+        out['por_territorio'][t] = {k: {'mulher': share(d, 'mulher', 'rg'), 'pp': share(d, 'pp', 'rr')}
+                                    for k, d in (('inscritos', e_t), ('participantes', p_t), ('certificados', c_t))}
+    return out
 
 
 # --------------------------------------------------------------------------------------
@@ -333,8 +361,13 @@ ROTULOS_WORKSHOP = {
 }
 
 
+def _aba_avaliacao(path):
+    nomes = pd.ExcelFile(path).sheet_names
+    return 'BaseAvaliacaoWorkshops' if 'BaseAvaliacaoWorkshops' in nomes else 'BaseWorkshops'
+
+
 def workshops_block(path):
-    w = pd.read_excel(path, sheet_name='BaseWorkshops')
+    w = pd.read_excel(path, sheet_name=_aba_avaliacao(path))
     cols = list(w.columns)
     item_cols = cols[5:18]
     yn14, yn15 = cols[18], cols[19]
@@ -343,7 +376,7 @@ def workshops_block(path):
     for r in ROMAN:
         w[r] = pd.to_numeric(w[r], errors='coerce')
         w.loc[~w[r].isin([0, 1, 2, 3]), r] = np.nan
-    all5 = pd.read_excel(path, sheet_name='BaseWorkshops')[cols[5:18]].apply(pd.to_numeric, errors='coerce').eq(5).sum(axis=1) >= 1
+    all5 = pd.read_excel(path, sheet_name=_aba_avaliacao(path))[cols[5:18]].apply(pd.to_numeric, errors='coerce').eq(5).sum(axis=1) >= 1
     pass  # valores fora de 0-3 (ex.: 5) já foram descartados acima
     n_resp = len(w)
     out = {'respostas': n_resp, 'respostas_escala_invalida': int(all5.sum())}
@@ -458,6 +491,344 @@ def mentorias_block(path, db, resumo_ment):
     return m
 
 
+# --------------------------------------------------------------------------------------
+# INSCRIÇÕES E CERTIFICADOS DOS WORKSHOPS (aba BaseInscricaoWorkshops)
+# --------------------------------------------------------------------------------------
+UFS_VALIDAS = {'SP', 'PE', 'DF', 'BA', 'RN', 'GO', 'PB', 'RR', 'MG', 'RJ', 'CE', 'AL', 'SE', 'MA', 'PI', 'ES', 'PR', 'SC', 'RS', 'MT', 'MS',
+               'TO', 'PA', 'AP', 'AM', 'AC', 'RO'}
+CATEGORICAS_WS = ['Gênero', 'Cor/Raça', 'Formação', 'Pessoa com deficiência?', 'Comunidades Tradicionais/Povos',
+                  'Linguagens de Interesse', 'UF Inscrito']
+
+
+def load_inscricoes_workshops(path):
+    w = pd.read_excel(path, sheet_name='BaseInscricaoWorkshops')
+    w.columns = [re.sub(r'\s+', ' ', str(c)).strip() for c in w.columns]
+    # a planilha traz números soltos (30 e 35) em campos de texto de linhas incompletas: tratados como "sem resposta"
+    for c in CATEGORICAS_WS:
+        w[c] = w[c].map(lambda v: np.nan if (pd.isna(v) or re.fullmatch(r'\d+(\.0)?', str(v).strip())) else str(v).strip())
+    w['UF Inscrito'] = w['UF Inscrito'].map(lambda v: v.upper() if isinstance(v, str) and v.upper() in UFS_VALIDAS else np.nan)
+    w['terr'] = w['Localidade'].str[:2]
+    # chave da pessoa: CPF válido (11 dígitos); quando o CPF veio inválido (30, 35 ou vazio), usa o nome
+    cpf = w['CPF Inscrito'].map(digits)
+    w['cpf'] = [c if isinstance(c, str) and len(c) == 11 else 'sem-cpf:' + nz(n) for c, n in zip(cpf, w['Nome'])]
+    w['status_g'] = w['Status'].map(lambda s: 'enviada' if s == 'enviada' else 'draft' if s == 'draft' else
+                                    'aband_socio' if 'sociocultural' in str(s) else 'aband_quest')
+    w['cert'] = (w['Certificado'] == 'Sim')
+    w['h'] = w['cert'].astype(int)           # desempate em person_table: prefere o registro com certificado
+    return w
+
+
+def inscricoes_ws_block(sub, uf):
+    """Bloco de inscrições/certificados de um recorte (uma localidade ou o conjunto). `uf` = estado do recorte ('ALL' = vários)."""
+    sub = sub.copy()
+    sub['cert_p'] = sub.groupby('cpf')['cert'].transform('any')   # certificado vale para a pessoa
+    out = {'rows': {'total': len(sub), 'enviada': int((sub.status_g == 'enviada').sum()), 'draft': int((sub.status_g == 'draft').sum()),
+                    'aband_socio': int((sub.status_g == 'aband_socio').sum()), 'aband_quest': int((sub.status_g == 'aband_quest').sum())}}
+    env_people = person_table(sub[sub.status_g == 'enviada'])
+    out['pessoas_total'] = int(sub.cpf.nunique())
+    out['pessoas_enviadas'] = len(env_people)
+    # certificado = uma pessoa certificada em uma localidade (quem faz dois workshops tem dois certificados)
+    out['certificados'] = int(sub[sub.cert].drop_duplicates(['cpf', 'Localidade']).shape[0])
+    out['certificados_pessoas'] = int(sub[sub.cert].cpf.nunique())
+    out['certificados_enviadas'] = int(sub[sub.cert & (sub.status_g == 'enviada')].drop_duplicates(['cpf', 'Localidade']).shape[0])
+    out['taxa_certificacao'] = pct(out['certificados'], out['pessoas_enviadas'])      # certificados / inscritos (inscrição enviada)
+    pdm, e = perfil_demografico(env_people, uf)
+    out.update(pdm)
+    # equidade ao longo do funil: inscritas/os -> certificadas/os (denominador: quem respondeu à pergunta)
+    def share(d, col, resp):
+        g = d[d[col].notna()]
+        return {'n': int(g[col].isin(resp).sum()), 'd': len(g), 'pct': pct(int(g[col].isin(resp).sum()), len(g))}
+    mulher = ['Mulher Cis', 'Mulher Trans', 'Pessoa não binária']; pp = ['Preta', 'Parda', 'Indígena']
+    cert = env_people[env_people.cert_p]
+    out['equidade_funil'] = {
+        'inscritos': {'mulher': share(env_people, 'Gênero', mulher), 'pp': share(env_people, 'Cor/Raça', pp)},
+        'certificados': {'mulher': share(cert, 'Gênero', mulher), 'pp': share(cert, 'Cor/Raça', pp)}}
+    return out
+
+
+def inscricoes_workshops(path, wk):
+    """Inscrições e certificados dos workshops, por localidade (e total)."""
+    w = load_inscricoes_workshops(path)
+    aval = {l['loc']: l for l in wk['localidades']}                # avaliações e datas (aba de avaliação)
+    order = {'SP': 0, 'PE': 1, 'DF': 2, 'BA': 3, 'RN': 4}
+    locais = sorted(w.Localidade.dropna().unique(), key=lambda l: (order[l[:2]], l))
+    res = {'ALL': inscricoes_ws_block(w, 'ALL')}
+    locs = []
+    for l in locais:
+        g = w[w.Localidade == l]
+        b = inscricoes_ws_block(g, l[:2])
+        res[l] = b
+        locs.append({'loc': l, 'uf': l[:2], 'cidade': l.split('/')[1], 'datas': aval.get(l, {}).get('datas', []),
+                     'rows_total': b['rows']['total'], 'enviadas': b['rows']['enviada'], 'pessoas_enviadas': b['pessoas_enviadas'],
+                     'certificados': b['certificados'], 'certificados_enviadas': b['certificados_enviadas'],
+                     'taxa_certificacao': b['taxa_certificacao'], 'avaliacoes': aval.get(l, {}).get('n', 0)})
+    # total = soma das localidades (a mesma pessoa pode ter feito mais de um workshop)
+    a = res['ALL']
+    a['pessoas_enviadas_localidades'] = sum(x['pessoas_enviadas'] for x in locs)
+    a['certificados'] = sum(x['certificados'] for x in locs)
+    a['certificados_enviadas'] = sum(x['certificados_enviadas'] for x in locs)
+    a['taxa_certificacao'] = pct(a['certificados'], a['pessoas_enviadas_localidades'])
+    res['locais'] = locais
+    res['por_localidade'] = locs
+    raw = pd.read_excel(path, sheet_name='BaseInscricaoWorkshops')
+    res['qualidade'] = {
+        'linhas': len(raw),
+        'linhas_perfil_numerico': int(raw['Gênero'].map(lambda v: bool(re.fullmatch(r'\d+(\.0)?', str(v).strip()))).sum()),
+        'cpf_invalido': int(sum(1 for c in raw['CPF Inscrito'].map(digits) if not (isinstance(c, str) and len(c) == 11))),
+        'certificados_linhas_sim': int((raw['Certificado'] == 'Sim').sum()),
+        'sem_resposta_genero': a['demo']['genero'].get('Sem resposta'),
+    }
+    res['status_por_localidade'] = [{'loc': x['loc'], **{k: int((w[w.Localidade == x['loc']].status_g == k).sum()) for k in ['enviada', 'draft', 'aband_socio', 'aband_quest']}} for x in locs]
+    return res
+
+
+# --------------------------------------------------------------------------------------
+# AVALIAÇÕES E AUSÊNCIAS (formulários identificados por CPF)
+# --------------------------------------------------------------------------------------
+def split_bullets(v):
+    """Respostas de múltipla escolha vêm como '• opção, • opção'."""
+    if pd.isna(v): return []
+    s = str(v).strip()
+    parts = re.findall(r'•\s*(.*?)(?=,\s*•|\s*$)', s, flags=re.S)
+    parts = [x.strip(' ,\n') for x in parts if x.strip(' ,\n')]
+    return parts or [s]
+
+
+AUS_Q1 = [('interesse', r'^meu interesse pessoal'), ('negocio', r'^meu negocio'), ('territorio', r'^meu territorio'),
+          ('grupo', r'^um grupo com o qual'), ('indicacao', r'^indicacao'), ('curiosidade', r'^curiosidade')]
+AUS_Q2 = [('reservou', r'pretendia participar de todo'), ('dependia', r'dependia da confirmacao'),
+          ('sem_compromisso', r'manifestacao de interesse'), ('outro', r'^outro entendimento')]
+AUS_Q3 = [('horario', r'^conflito de horario'), ('saude', r'^problema de saude'), ('lembrete', r'^esqueci'),
+          ('digital', r'^dificuldade de acesso'), ('deslocamento', r'^problemas de deslocamento'), ('formato', r'^formato ou condicoes'),
+          ('expectativa', r'^a atividade nao correspondeu'), ('gratuidade', r'^por ser gratuita'), ('outro', r'^outro motivo')]
+AUS_ROTULOS = {
+    'q1': {'interesse': 'Interesse pessoal, aprendizado ou desenvolvimento', 'negocio': 'Meu negócio, coletivo, organização ou comunidade',
+           'territorio': 'Meu território e as pessoas que vivem nele', 'grupo': 'Grupo pouco representado com o qual me identifico',
+           'indicacao': 'Indicação, convite ou expectativa de outra pessoa/instituição', 'curiosidade': 'Curiosidade ou oportunidade gratuita'},
+    'q2': {'reservou': 'Pretendia participar de tudo e já havia reservado tempo', 'dependia': 'Pretendia participar, mas dependia de agenda ou outras condições',
+           'sem_compromisso': 'Via a inscrição como manifestação de interesse, sem compromisso', 'outro': 'Outro entendimento'},
+    'q3': {'horario': 'Conflito de horário, trabalho, estudo ou cuidado', 'saude': 'Saúde ou imprevisto pessoal/familiar',
+           'lembrete': 'Esqueci, não recebi lembrete ou não entendi data/local/orientações',
+           'digital': 'Dificuldade de internet, equipamento, plataforma ou CultB',
+           'deslocamento': 'Deslocamento, distância, segurança, custo ou acessibilidade',
+           'formato': 'Formato ou condições da atividade (duração, horário, intervalo)',
+           'expectativa': 'A atividade não correspondeu às expectativas', 'gratuidade': 'Por ser gratuita, senti menor compromisso',
+           'outro': 'Outro motivo / prefiro não responder'},
+}
+AUS_MACRO = {   # grandes grupos de motivo, para orientar as ações
+    'agenda': ('Agenda, trabalho, cuidado e saúde', ['horario', 'saude']),
+    'comunicacao': ('Comunicação e acesso digital', ['lembrete', 'digital']),
+    'deslocamento': ('Deslocamento e acessibilidade', ['deslocamento']),
+    'formato': ('Formato e expectativa', ['formato', 'expectativa']),
+    'outros': ('Gratuidade e outros motivos', ['gratuidade', 'outro']),
+}
+TEXT_THEMES = {
+    'Aulas gravadas / acesso ao conteúdo': r'(gravad|gravac|assistir depois|depois\b|acesso ao conteudo|nuvem|material)',
+    'Lembretes e comunicação': r'(lembret|comunicac|avisar|antecedenc|e mail|email|whatsapp|agenda|divulg|aviso)',
+    'Horário e duração': r'(horario|duracao|4 ?h|2 ?h|longa|longo|curto|dias seguidos|sabado|a noite|mesmo dia|cansativ|mais dias|blocos)',
+    'Conflito de agenda e trabalho': r'(trabalho|reuniao|reunioes|emprego|rotina|compromisso|faculdade|curso presencial|cliente|agenda)',
+    'Saúde, família e imprevistos': r'(saude|doenc|hospital|cirurgi|famil|avo\b|panico|adoec|mudanca|religios)',
+    'Problemas técnicos e de acesso': r'(link|wifi|energia|internet|conexao|chuva|erro|nao funcionava|plataforma)',
+    'Nova oportunidade e continuidade': r'(nova oportunidade|nova turma|proximas|futuras|outros anos|continu|mais cursos|mais acoes|novamente)',
+    'Certificação': r'(certific)',
+    'Conteúdo: aprofundar, exemplos e prática': r'(superficial|avancad|aprofund|iniciante|exemplo|pratic|estudo de caso|especifica|mais tempo|mais conteudo)',
+    'Elogio e gratidão': r'(parabeni|agrade|incrivel|perfeit|maravilh|obrigad|otim|excelente|magistral|amei|gostei|belissim|foi tudo|aprendizado)',
+}
+
+
+def classificar_multi(v, padroes):
+    ks = set()
+    for opt in split_bullets(v):
+        t = nz(opt)
+        for k, rx in padroes:
+            if re.search(rx, t): ks.add(k); break
+    return ks
+
+
+def temas_texto(series, themes=TEXT_THEMES):
+    s = series.dropna().astype(str).map(nz)
+    s = s[~s.isin(['', 'nao se aplica', 'nao', 'nenhuma', 'nenhum'])]
+    out = {'n_textos': int(len(s)), 'temas': {k: int(s.map(lambda t: bool(re.search(p, t))).sum()) for k, p in themes.items()}}
+    return out
+
+
+def _cruza(df, mask_map, key='q3', ordem=None):
+    """Para cada grupo (máscara), nº de respondentes e quantos citam cada opção."""
+    res = {}
+    for g, m in mask_map.items():
+        sub = df[m]
+        ks = (ordem or [k for k, _ in AUS_Q3])
+        res[g] = {'n': int(len(sub)), 'q3': {k: int(sub['k3'].map(lambda x: k in x).sum()) for k in ks},
+                  'macro': {mk: int(sub['k3'].map(lambda x: bool(x & set(v[1]))).sum()) for mk, v in AUS_MACRO.items()}}
+    return res
+
+
+def ausencias_block(aus, who, seg_label):
+    """Formulário de ausências. `who`: DataFrame (cpf, seg, gen, raca, faixa, h, cert, part) para cruzar o perfil."""
+    d = aus.copy()
+    d.columns = ['ts', 'cpf_raw', 'q1', 'q2', 'q3', 'sug'] + list(d.columns[6:])
+    d['cpf'] = d['cpf_raw'].map(digits)
+    d['k1'] = d['q1'].map(lambda v: classificar_multi(v, AUS_Q1))
+    d['k3'] = d['q3'].map(lambda v: classificar_multi(v, AUS_Q3))
+    d['k2'] = d['q2'].map(lambda v: next(iter(classificar_multi(v, AUS_Q2)), None))
+    d = d.merge(who.drop_duplicates('cpf'), on='cpf', how='left')
+    n = len(d)
+    out = {'n': n, 'periodo': [str(d.ts.min().date()), str(d.ts.max().date())],
+           'com_cpf': int(d.cpf.notna().sum()), 'identificados': int(d.seg.notna().sum())}
+    out['q1'] = {k: int(d['k1'].map(lambda x: k in x).sum()) for k, _ in AUS_Q1}
+    out['q2'] = {k: int((d['k2'] == k).sum()) for k, _ in AUS_Q2}
+    out['q3'] = {k: int(d['k3'].map(lambda x: k in x).sum()) for k, _ in AUS_Q3}
+    out['q3_sem_resposta'] = int(d['k3'].map(len).eq(0).sum())
+    out['q3_um_motivo'] = int(d['k3'].map(len).eq(1).sum())
+    out['macro'] = {mk: int(d['k3'].map(lambda x: bool(x & set(v[1]))).sum()) for mk, v in AUS_MACRO.items()}
+    out['macro_rotulos'] = {mk: v[0] for mk, v in AUS_MACRO.items()}
+    out['rotulos'] = AUS_ROTULOS
+    # cruzamentos (só com pessoas identificadas)
+    ident = d[d.seg.notna()]
+    seg_order = [x for x in who.seg.dropna().unique()]
+    out['seg_label'] = seg_label
+    out['por_segmento'] = _cruza(ident, {sg: ident.seg == sg for sg in sorted(ident.seg.unique(), key=lambda x: (seg_order.index(x) if x in seg_order else 99))})
+    out['por_compromisso'] = _cruza(d, {k: d['k2'] == k for k, _ in AUS_Q2 if (d['k2'] == k).any()})
+    gen_m = ident['gen'].isin(['Mulher Cis', 'Mulher Trans', 'Pessoa não binária'])
+    out['por_genero'] = _cruza(ident[ident.gen.notna()], {'mulher': gen_m[ident.gen.notna()], 'homem': ~gen_m[ident.gen.notna()]})
+    pp = ident['raca'].isin(['Preta', 'Parda', 'Indígena'])
+    out['por_raca'] = _cruza(ident[ident.raca.notna()], {'pp': pp[ident.raca.notna()], 'nao_pp': ~pp[ident.raca.notna()]})
+    fx = ident[ident.faixa.notna() & (ident.faixa != 'Sem dado')]
+    idade = fx['faixa'].map(lambda f: 'ate_34' if f in ('Até 19', '20 a 24', '25 a 29', '30 a 34') else ('35_49' if f in ('35 a 39', '40 a 44', '45 a 49') else '50_mais'))
+    out['por_idade'] = _cruza(fx, {k: idade == k for k in ('ate_34', '35_49', '50_mais')})
+    if 'part' in d.columns and d['part'].notna().any():
+        # engajamento: nunca compareceu x participou e não concluiu x concluiu mesmo faltando
+        eng = {'nunca': ident['part'] == 0, 'desistiu': (ident['part'] > 0) & (~ident['cert'].fillna(False).astype(bool)),
+               'concluiu': ident['cert'].fillna(False).astype(bool)}
+        out['por_engajamento'] = _cruza(ident, eng)
+    out['sugestoes'] = temas_texto(d['sug'])
+    out['_textos'] = d['sug'].dropna().astype(str).str.strip().tolist()
+    return out, d
+
+
+def pessoas_aulas(ap_env):
+    return pd.DataFrame({'cpf': ap_env.cpf, 'seg': ap_env.terr, 'gen': ap_env['Gênero'], 'raca': ap_env['Cor/Raça'],
+                         'faixa': ap_env.idade_calc.map(band), 'h': ap_env.h, 'part': ap_env.n_aulas, 'cert': ap_env.CERTIFICADO.eq('Sim')})
+
+
+AV_AULAS = [  # (bloco, rótulo curto, coluna posicional)
+    ('aprendizagem', 'Compreendeu os principais conceitos'), ('aprendizagem', 'Conteúdo claro e fácil de acompanhar'),
+    ('aprendizagem', 'Exemplos ajudaram a entender o tema'), ('aprendizagem', 'Atividades fixaram o conteúdo'),
+    ('aprendizagem', 'Sente-se capaz de aplicar na prática'), ('aprendizagem', 'Tempo suficiente para compreender'),
+    ('aprendizagem', 'Terminou com menos dúvidas'), ('aprendizagem', 'Material de apoio ajudou'),
+    ('experiencia', 'Aula atendeu às expectativas'), ('experiencia', 'Condução favoreceu a participação'),
+    ('experiencia', 'Ritmo da aula adequado'), ('experiencia', 'Comunicação do(a) instrutor(a) clara'),
+    ('experiencia', 'À vontade para perguntar e participar'), ('experiencia', 'Recursos (slides, vídeos) adequados'),
+    ('experiencia', 'Relevante para os objetivos de aprendizagem'), ('experiencia', 'Recomendaria a aula'),
+]
+
+
+def avaliacao_aulas_block(path, ap_env):
+    d = pd.read_excel(path, sheet_name='BaseAvaliacaoAulasSincronas')
+    cols = list(d.columns)
+    d = d.rename(columns={cols[0]: 'ts', cols[1]: 'cpf_raw'})
+    d['cpf'] = d['cpf_raw'].map(digits)
+    qs = cols[2:18]
+    items = []
+    for i, (bloco, rot) in enumerate(AV_AULAS):
+        v = d[qs[i]].map(yn)
+        n = int(v.notna().sum()); sim = int((v == 'Sim').sum())
+        items.append({'id': i + 1, 'bloco': bloco, 'rotulo': rot, 'pergunta': re.sub(r'^\d+\.\s*', '', str(qs[i])), 'n': n, 'sim': sim,
+                      'nao': n - sim, 'pct': pct(sim, n)})
+    out = {'n': len(d), 'periodo': [str(d.ts.min().date()), str(d.ts.max().date())], 'com_cpf': int(d.cpf.notna().sum()), 'itens': items}
+    for b in ('aprendizagem', 'experiencia'):
+        its = [x for x in items if x['bloco'] == b]
+        out['indice_' + b] = pct(sum(x['sim'] for x in its), sum(x['n'] for x in its))
+    out['indice_geral'] = pct(sum(x['sim'] for x in items), sum(x['n'] for x in items))
+    out['respondentes_100pct_sim'] = int(sum(1 for _, r in d.iterrows() if all(yn(r[q]) in ('Sim', None) for q in qs) and any(yn(r[q]) for q in qs)))
+    who = pessoas_aulas(ap_env)
+    dd = d.merge(who.drop_duplicates('cpf'), on='cpf', how='left')
+    pt = {}
+    for t in TERRS:
+        g = dd[dd.seg == t]
+        if not len(g): continue
+        vals = {b: [] for b in ('aprendizagem', 'experiencia')}
+        for i, (b, _) in enumerate(AV_AULAS):
+            vals[b] += list(g[qs[i]].map(yn).dropna())
+        pt[t] = {'n': int(len(g)), 'aprendizagem': pct(sum(1 for x in vals['aprendizagem'] if x == 'Sim'), len(vals['aprendizagem'])),
+                 'experiencia': pct(sum(1 for x in vals['experiencia'] if x == 'Sim'), len(vals['experiencia'])),
+                 'horas_media': round(float(g.h.mean()), 1), 'certificados': int(g.cert.sum())}
+    out['por_territorio'] = pt
+    out['identificados'] = int(dd.seg.notna().sum())
+    out['participantes_por_territorio'] = {t: int((ap_env[ap_env.terr == t].n_aulas > 0).sum()) for t in TERRS}
+    out['certificados_por_territorio'] = {t: int((ap_env[ap_env.terr == t].CERTIFICADO == 'Sim').sum()) for t in TERRS}
+    out['sugestoes'] = temas_texto(d[cols[18]])
+    out['_textos'] = d[cols[18]].dropna().astype(str).str.strip().tolist()
+    return out
+
+
+MENT_ORDEM = {
+    1: ['1 vez', '2 a 3 vezes', '4 a 5 vezes', '6 vezes ou mais'],
+    2: ['1 ferramenta', '2 ferramentas', '3 ferramentas', '4 ou mais ferramentas'],
+    4: ['Consigo usar somente com acompanhamento', 'Consigo usar algumas ferramentas sem ajuda', 'Consigo usar a maioria das ferramentas sem ajuda',
+        'Consigo escolher e usar sozinho as ferramentas de que preciso'],
+    5: ['1', '2', '3', '4 ou mais'], 6: ['Nenhuma', '1', '2', '3', '4 ou mais'],
+    8: ['Nenhuma', '1 pessoa', '2 a 5 pessoas', '6 a 10 pessoas'],
+    9: ['Não', 'Não sei informar', 'Sim, 1 grupo', 'Sim, 2 grupos'],
+    10: ['Não ficaram registradas', 'Ficaram em arquivo pessoal', 'Ficaram em arquivo compartilhado com a equipe', 'Não se aplica'],
+    11: ['Em uma atividade pontual', 'Uma vez por mês', 'Duas ou três vezes por mês', 'Toda semana'],
+    12: ['Ainda não consigo ensinar', 'Consigo explicar partes da ferramenta, com apoio', 'Consigo ensinar o uso básico, com apoio',
+         'Consigo ensinar o uso básico sem apoio', 'Consigo ensinar, acompanhar a aplicação e tirar dúvidas sem apoio'],
+    14: ['Houve uso pontual, sem continuidade definida', 'As ferramentas já são usadas em ações ou projetos',
+         'As ferramentas são usadas, compartilhadas e mantidas pela equipe ou coletivo',
+         'As ferramentas são usadas por diferentes pessoas ou grupos e têm continuidade planejada no território'],
+}
+MENT_FERRAMENTAS = ['Planejamento de ações', 'Cronograma', 'Orçamento', 'Plano de Trabalho', 'Mapeamento de parceiros e recursos do território',
+                    'Definição de objetivos, metas', 'Organização de documentos', 'Comunicação e mobilização de público']
+MENT_RESULTADOS = ['Ação ou projeto com objetivos e metas definidos', 'Cronograma organizado', 'Orçamento elaborado ou atualizado',
+                   'Inscrição em edital ou oportunidade de apoio', 'Prestação de contas organizada', 'Novas parcerias no território',
+                   'Divisão de tarefas mais clara na equipe', 'Registro ou modelo que poderá ser reutilizado']
+
+
+def avaliacao_mentorias_block(path, m):
+    d = pd.read_excel(path, sheet_name='BaseAvaliacaoMentorias')
+    cols = list(d.columns)
+    d = d.rename(columns={cols[0]: 'ts', cols[1]: 'cpf_raw'})
+    d['cpf'] = d['cpf_raw'].map(digits)
+    n = len(d)
+    out = {'n': n, 'periodo': [str(d.ts.min().date()), str(d.ts.max().date())], 'com_cpf': int(d.cpf.notna().sum())}
+    dist = {}
+    for q in range(1, 15):
+        col = cols[1 + q]
+        if q in (3, 7):
+            ops = MENT_FERRAMENTAS if q == 3 else MENT_RESULTADOS
+            dist[str(q)] = [[o, int(d[col].map(lambda v: isinstance(v, str) and o in v).sum())] for o in ops]
+        else:
+            ser = d[col].map(lambda v: None if pd.isna(v) else str(v).strip().replace('\n', ''))
+            ordem = MENT_ORDEM.get(q)
+            vcs = ser.value_counts()
+            labs = ordem or list(vcs.index)
+            dist[str(q)] = [[l, int(vcs.get(l, 0))] for l in labs] + [[l, int(v)] for l, v in vcs.items() if ordem and l not in ordem]
+    out['dist'] = dist
+    out['perguntas'] = {str(q): re.sub(r'^\d+\.\s*', '', str(cols[1 + q])).strip() for q in range(1, 15)}
+    def cnt(q, labs): return int(sum(v for l, v in dist[str(q)] if l in labs))
+    out['indicadores'] = {
+        'uso_2mais_vezes': pct(n - cnt(1, ['1 vez']), n), 'tres_mais_ferramentas': pct(cnt(2, ['3 ferramentas', '4 ou mais ferramentas']), n),
+        'autonomia_alta': pct(cnt(4, MENT_ORDEM[4][2:]), n), 'instrumentos_2mais': pct(n - cnt(5, ['1']), n),
+        'aplicou_2mais_iniciativas': pct(cnt(6, ['2', '3', '4 ou mais']), n), 'compartilhou': pct(n - cnt(8, ['Nenhuma']), n),
+        'grupos_passaram_a_usar': pct(cnt(9, ['Sim, 1 grupo', 'Sim, 2 grupos']), n), 'registro_compartilhado': pct(cnt(10, [MENT_ORDEM[10][2]]), n),
+        'uso_previsto_mensal_ou_mais': pct(n - cnt(11, ['Em uma atividade pontual']), n),
+        'preparo_ensinar_sem_apoio': pct(cnt(12, MENT_ORDEM[12][3:]), n), 'legado_em_uso': pct(cnt(14, MENT_ORDEM[14][1:]), n),
+        'legado_continuidade_equipe': pct(cnt(14, MENT_ORDEM[14][2:]), n),
+    }
+    # cruzamento com a lista de mentoria (CPF -> base de inscrições -> mentoria)
+    mm = m[m.db_cpf.notna()].drop_duplicates('db_cpf').set_index('db_cpf')
+    d['h'] = d.cpf.map(mm['h']); d['terr'] = d.cpf.map(mm['Território']); d['cert'] = d.cpf.map(mm['cert'])
+    out['identificados'] = int(d.terr.notna().sum())
+    out['por_territorio'] = {t: int((d.terr == t).sum()) for t in ['SP', 'PE', 'DF', 'BA', 'RN']}
+    out['horas_media_respondentes'] = round(float(d.h.dropna().mean()), 1) if d.h.notna().any() else None
+    out['certificados_entre_respondentes'] = int(d.cert.fillna(False).astype(bool).sum())
+    out['sugestoes'] = temas_texto(d[cols[16]])
+    out['_textos'] = d[cols[16]].dropna().astype(str).str.strip().tolist()
+    return out
+
+
+
 def build(args):
     a, planned = load_aulas(args.exec)
     db = pd.read_excel(args.db, sheet_name='DB_Inscritos')
@@ -467,7 +838,7 @@ def build(args):
     resumo = pd.read_excel(args.db, sheet_name='DB_ResumoMentorias')
     resumo['nm'] = resumo['Nome'].map(nz)
 
-    res = {'meta': {'fonte': 'BaseDeDados_Aulas_Workshops_Mentorias.xlsx', 'cert_min_h': CERT_MIN_H}}
+    res = {'meta': {'fonte': 'BaseDeDados_Aulas_Workshops_Mentorias.xlsx', 'cert_min_h': CERT_MIN_H, 'hoje': str(pd.Timestamp.today().date())}}
 
     # ---------------- AULAS ----------------
     res['aulas'] = {}
@@ -481,12 +852,14 @@ def build(args):
     g = a[a.status_g == 'enviada'].groupby('cpf')['terr'].nunique()
     res['aulas']['pessoas_em_mais_de_um_territorio'] = int((g > 1).sum())
     res['aulas']['cpfs_duplicados_no_mesmo_territorio'] = int(a.groupby(['terr', 'cpf']).size().gt(1).sum())
-    res['aulas']['idade_campo_invalido'] = int((pd.to_numeric(a['Idade'], errors='coerce') > 120).sum())
-    res['aulas']['registros_PE_BA_horas_total_vazio'] = int(a[a.terr.isin(['PE', 'BA'])]['TOTAL'].isna().sum()) if 'TOTAL' in a.columns else None
+    _pe = person_table(a[a.status_g == 'enviada'])
+    res['aulas']['idade_na'] = {'enviadas': int(_pe.idade_calc.isna().sum()), 'de': int(len(_pe)),
+                                'por_territorio': {t: int(_pe[_pe.terr == t].idade_calc.isna().sum()) for t in TERRS}}
 
     # ---------------- WORKSHOPS ----------------
     wk, wdf = workshops_block(args.exec)
     res['workshops'] = wk
+    res['workshops']['inscricoes'] = inscricoes_workshops(args.exec, wk)
 
     # ---------------- MENTORIAS ----------------
     m = mentorias_block(args.exec, db, resumo)
@@ -586,8 +959,7 @@ def build(args):
     both_cpf = {r.aulas_cpf for r in m.itertuples() if r.aulas_cpf}
     tr = {}
     tr['inscricoes_original'] = {'pessoas': int(db['cpf'].nunique()), 'enviadas': len(db_env)}
-    tr['aulas'] = {'pessoas_enviadas': len(ap_env), 'participantes': int(ap_env.part.sum()), 'cert': int(ap_env[ap_env.terr.isin(['SP', 'DF'])].cert.sum()),
-                   'participantes_sp_df': int(ap_env[ap_env.terr.isin(['SP', 'DF'])].part.sum())}
+    tr['aulas'] = {'pessoas_enviadas': len(ap_env), 'participantes': int(ap_env.part.sum()), 'cert': int(ap_env.cert.sum())}
     ov = ap_env[ap_env.in_db]
     tr['aulas_na_base_original'] = {'pessoas': len(ov), 'participantes': int(ov.part.sum()),
                                     'taxa_participacao': pct(int(ov.part.sum()), len(ov))}
@@ -644,6 +1016,64 @@ def build(args):
         'aulas_participantes': perfil(apx[apx.part], 'Gênero', 'Cor/Raça', 'Formação'),
     }
 
+    # ---------------- WORKSHOPS por CPF (trilha) ----------------
+    wi = load_inscricoes_workshops(args.exec)
+    wenv = wi[wi.status_g == 'enviada']
+    wp = person_table(wenv).copy()
+    wp['cert_p'] = wp.cpf.isin(set(wi[wi.cert].cpf))
+    wp['idade_calc'] = wp.apply(age_at, axis=1)
+    wcpf = set(wenv[wenv.cpf.str.len() == 11].cpf)
+    wcert = set(wi[wi.cert & (wi.cpf.str.len() == 11)].cpf)
+    acpf = set(ap_env.cpf)
+    apart = set(ap_env[ap_env.part].cpf)
+    mcpf = set(m['db_cpf'].dropna()); mact = set(m[m.ativo]['db_cpf'].dropna())
+    tr['workshops'] = {'pessoas_enviadas_cpf': len(wcpf), 'certificadas_cpf': len(wcert),
+                       'em_aulas': len(wcpf & acpf), 'em_aulas_participaram': len(wcpf & apart),
+                       'em_mentorias': len(wcpf & mcpf), 'em_mentorias_ativas': len(wcpf & mact),
+                       'cert_e_aulas_participantes': len(wcert & apart), 'cert_e_mentorias_ativas': len(wcert & mact)}
+    # participação formativa por pessoa (CPF) nos três formatos: ativo = aula com presença, workshop com certificado, mentoria com horas
+    fm = {}
+    for c in apart: fm.setdefault(c, set()).add('aulas')
+    for c in wcert: fm.setdefault(c, set()).add('workshops')
+    for c in mact: fm.setdefault(c, set()).add('mentorias')
+    from collections import Counter
+    nform = Counter(len(v) for v in fm.values())
+    tr['formatos_por_pessoa'] = {'pessoas_ativas_em_algum': len(fm), 'em_1': nform.get(1, 0), 'em_2': nform.get(2, 0), 'em_3': nform.get(3, 0),
+                                 'aulas_workshops': sum(1 for v in fm.values() if {'aulas', 'workshops'} <= v),
+                                 'aulas_mentorias': sum(1 for v in fm.values() if {'aulas', 'mentorias'} <= v),
+                                 'workshops_mentorias': sum(1 for v in fm.values() if {'workshops', 'mentorias'} <= v),
+                                 'sem_cpf_valido_workshops': int(wp.cpf.str.startswith('sem-cpf').sum())}
+    # perfil das pessoas por número de formatos (equidade)
+    allp = pd.concat([ap_env[['cpf', 'Gênero', 'Cor/Raça']], wp[['cpf', 'Gênero', 'Cor/Raça']].loc[wp.cpf.str.len() == 11], 
+                      loc[['db_cpf', 'gen', 'raca']].rename(columns={'db_cpf': 'cpf', 'gen': 'Gênero', 'raca': 'Cor/Raça'})]).dropna(subset=['cpf']).drop_duplicates('cpf')
+    allp['n_form'] = allp.cpf.map(lambda c: len(fm.get(c, ())))
+    def _sh(d):
+        g = d[d['Gênero'].notna()]; r = d[d['Cor/Raça'].notna()]
+        return {'n': len(d), 'mulher': {'n': int(g['Gênero'].isin(['Mulher Cis', 'Mulher Trans', 'Pessoa não binária']).sum()), 'd': len(g)},
+                'pp': {'n': int(r['Cor/Raça'].isin(['Preta', 'Parda', 'Indígena']).sum()), 'd': len(r)}}
+    tr['perfil_por_formatos'] = {'0': _sh(allp[allp.n_form == 0]), '1': _sh(allp[allp.n_form == 1]), '2_ou_mais': _sh(allp[allp.n_form >= 2])}
+
+    # ---------------- AUSÊNCIAS E AVALIAÇÕES ----------------
+    who_a = pessoas_aulas(ap_env)
+    wp['faixa'] = wp.idade_calc.map(band)
+    who_w = pd.DataFrame({'cpf': wp.cpf, 'seg': wp.terr, 'gen': wp['Gênero'], 'raca': wp['Cor/Raça'], 'faixa': wp.faixa, 'cert': wp.cert_p})
+    who_m = pd.DataFrame({'cpf': loc.db_cpf, 'seg': loc['Território'], 'gen': loc.gen, 'raca': loc.raca, 'faixa': 'Sem dado',
+                          'part': (loc.h > 0).astype(int), 'cert': loc.cert})
+    aus = {}
+    textos = {}
+    for k, sh, who, lab in [('aulas', 'BaseAusenciasAulasSincronas', who_a, 'Território'),
+                            ('workshops', 'BaseAusenciasWorkshops', who_w, 'Território'),
+                            ('mentorias', 'BaseAusenciasMentorias', who_m, 'Território')]:
+        raw = pd.read_excel(args.exec, sheet_name=sh)
+        aus[k], _ = ausencias_block(raw, who, lab)
+        textos['ausencias_' + k] = aus[k].pop('_textos')
+    res['ausencias'] = aus
+    res['avaliacao_aulas'] = avaliacao_aulas_block(args.exec, ap_env)
+    textos['avaliacao_aulas'] = res['avaliacao_aulas'].pop('_textos')
+    res['avaliacao_mentorias'] = avaliacao_mentorias_block(args.exec, m)
+    textos['avaliacao_mentorias'] = res['avaliacao_mentorias'].pop('_textos')
+    res['_textos'] = textos
+
     # visão territorial (UF)
     ufs = ['SP', 'PE', 'DF', 'BA', 'RN']
     env_db = db[db['Status Inscrição Detalhado'] == 'Enviada'].copy()
@@ -663,8 +1093,12 @@ def build(args):
     res['trilha'] = tr
     res['qualidade'] = {
         'aulas_cpfs_duplicados_mesmo_territorio': res['aulas']['cpfs_duplicados_no_mesmo_territorio'],
-        'aulas_idade_campo_invalido': res['aulas']['idade_campo_invalido'],
-        'colunas_sem_preenchimento_aulas': ['Remanescentes', 'Selecionados', 'Tem certificado'],
+        'aulas_idade_na_enviadas': res['aulas']['idade_na']['enviadas'],
+        'aulas_certificado_vazio': int(a['CERTIFICADO'].isna().sum()),
+        'avaliacoes_aulas_sem_cpf_valido': int(res['avaliacao_aulas']['n'] - res['avaliacao_aulas']['com_cpf']),
+        'avaliacoes_aulas_nao_identificadas': int(res['avaliacao_aulas']['n'] - res['avaliacao_aulas']['identificados']),
+        'ausencias_nao_identificadas': {k: int(v['n'] - v['identificados']) for k, v in res['ausencias'].items()},
+        'colunas_nao_usadas': ['Selecionados', 'Remanescentes'],
     }
     return res
 
@@ -676,6 +1110,10 @@ if __name__ == '__main__':
     ap.add_argument('--html', help='formacoes.html a atualizar: substitui o bloco <script id="dados"> pelo JSON calculado')
     args = ap.parse_args()
     res = build(args)
+    textos = res.pop('_textos', {})
+    if args.keep_samples:
+        with open(args.out.replace('.json', '_textos.json'), 'w', encoding='utf-8') as f:
+            json.dump(textos, f, ensure_ascii=False, indent=1)
     if not args.keep_samples:
         for k in list(res['workshops']):
             if k.startswith('_amostra'): del res['workshops'][k]
